@@ -36,7 +36,8 @@ while True:
                     con.sendall(b"Novo registro efetuado")
                 else:
                     print("Cliente já registrado")
-                    con.sendall(b"Cliente ja registrado")
+                    con.sendall(b"Usuario ja registrado")
         if not msg: break
+    
     print('Finalizando conexao do cliente', cliente)
     con.close()
