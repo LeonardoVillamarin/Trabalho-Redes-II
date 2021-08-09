@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
-import controllers.connect as client
+import controllers.client as client
 from home import *
 
 
@@ -18,7 +18,8 @@ def start_connection():
     resp = client.conn(name.get(), ip.get())
     print("Do lado do cliente: ", resp)
     if 'Novo registro efetuado' in resp:
-        exec(open("home.py").read())
+        set_home(name.get())
+        # exec(open("home.py").read())
 
     elif 'Usuário ja registrado' in resp:
         messagebox.showinfo("Atenção", "Usuário já registrado. A conexão foi estabelecida.")
