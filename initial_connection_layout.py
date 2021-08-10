@@ -1,7 +1,6 @@
+from home_layout import *
 from tkinter import *
 from tkinter import messagebox
-import controllers.client as client
-from home import *
 
 
 def valid_information():
@@ -16,18 +15,17 @@ def start_connection():
         return
 
     resp = client.conn(name.get(), ip.get())
-    print("Do lado do cliente: ", resp)
+    print(resp)
     if 'Novo registro efetuado' in resp:
         set_home(name.get())
-        # exec(open("home.py").read())
 
     elif 'Usuário ja registrado' in resp:
-        messagebox.showinfo("Atenção", "Usuário já registrado. A conexão foi estabelecida.")
-        set_home(name.get())
-        #exec(open("home.py").read())
+        messagebox.showinfo("Atenção", "Usuário já registrado. Tente outro nome.")
+        client.close_conn()
 
     else:
         messagebox.showerror("Error", "Erro ao fazer requisição: " + resp)
+
 
 window = Tk()
 window.geometry("530x600")
