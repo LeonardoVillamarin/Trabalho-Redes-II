@@ -4,7 +4,7 @@ import threading
 
 
 HOST = '127.0.0.1'  # Endereco IP do Servidor
-PORT = 5001  # Porta que o Servidor esta
+PORT = 5002  # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 orig = (HOST, PORT)
 tcp.bind(orig)
@@ -15,10 +15,13 @@ clientes = {}
 print("Servidor Iniciado")
 
 
-def sendall(con, origin):
-    for client in clientes:
-        if client != origin:
-            con.send(('{"event":' + origin + " está online!}").encode())
+def sendall(origin):
+    try:
+        for client in clientes:
+            if client != origin:
+                clientes.get(client)[2].send(('{"event": "' + origin + ' está online!"}').encode())
+    except Exception as e:
+        print("SendAll error: " + str(e))
 
 
 def in_communication(client, con):
@@ -34,10 +37,10 @@ def in_communication(client, con):
             if "Registro" in msg.keys():
                 name = msg.get("Registro")
                 if name not in clientes:
-                    clientes[name] = [ip_cliente, port_cliente]
+                    clientes[name] = [ip_cliente, port_cliente, con]
                     con.send("Novo registro efetuado".encode())
                     print(clientes)
-                    sendall(con, name)
+                    sendall(name)
                 else:
                     con.send(("Usuário ja registrado").encode())
                     # if ip_cliente != clientes.get(name)[0] or port_cliente != clientes.get(name)[1]:
