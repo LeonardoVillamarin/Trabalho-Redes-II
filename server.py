@@ -2,9 +2,8 @@ import socket
 import json
 import threading
 
-
 HOST = '127.0.0.1'  # Endereco IP do Servidor
-PORT = 5002  # Porta que o Servidor esta
+PORT = 5000  # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 orig = (HOST, PORT)
 tcp.bind(orig)
@@ -25,62 +24,72 @@ def sendall(origin):
 
 
 def in_communication(client, con):
-    ip_cliente = client[0]
-    port_cliente = client[1]
+    try:
+        ip_cliente = client[0]
+        port_cliente = client[1]
 
-    while True:
-        msg = con.recv(1024).decode()
+        while True:
+            msg = con.recv(1024).decode()
 
-        if "{" in msg:
-            msg = json.loads(msg)
+            if "{" in msg:
+                msg = json.loads(msg)
 
-            if "Registro" in msg.keys():
-                name = msg.get("Registro")
-                if name not in clientes:
-                    clientes[name] = [ip_cliente, port_cliente, con]
-                    con.send("Novo registro efetuado".encode())
-                    print(clientes)
-                    sendall(name)
-                else:
-                    con.send(("Usuário ja registrado").encode())
-                    # if ip_cliente != clientes.get(name)[0] or port_cliente != clientes.get(name)[1]:
-                    #     clientes[name] = [ip_cliente, port_cliente]
-            elif "Consulta" in msg.keys():
-                name = msg.get("Consulta")
-                # se buscou com vazio, deve retornar todos os usuários
-                # Todo: Melhorar a montagem desse json
-                if len(name) == 0:
-                    i = 0
-                    response = '{"clients": ['
-                    for client in clientes:
-                        response += '{"user":"' + client + '", "ip":"' + clientes.get(client)[0] + '", "port": "'\
-                                    + str(clientes.get(client)[1])
-                        if i == len(clientes)-1:
-                            response += '"}'
-                        else:
-                            response += '"},'
-                        i += 1
+                if "Registro" in msg.keys():
+                    name = msg.get("Registro")
+                    if name not in clientes:
+                        clientes[name] = [ip_cliente, port_cliente, con]
+                        con.send("Novo registro efetuado".encode())
+                        print(clientes)
+                        sendall(name)
+                    else:
+                        con.send(("Usuário ja registrado").encode())
+                        con.close()
+                        print('Usuário já registrado: ' + name + ' - A conexão foi finalizada.')
+                        return
 
-                    response += ']}'
-                    con.send(response.encode())
+                elif "Consulta" in msg.keys():
+                    name = msg.get("Consulta")
+                    # se buscou com vazio, deve retornar todos os usuários
+                    # Todo: Melhorar a montagem desse json
+                    if len(name) == 0:
+                        i = 0
+                        response = '{"clients": ['
+                        for client in clientes:
+                            response += '{"user":"' + client + '", "ip":"' + clientes.get(client)[0] + '", "port": "' \
+                                        + str(clientes.get(client)[1])
+                            if i == len(clientes) - 1:
+                                response += '"}'
+                            else:
+                                response += '"},'
+                            i += 1
 
-                # Caso contrário, retorna só a primeira ocorrência
-                elif name in clientes:
-                    con.send(('{"clients": [{"user":"' + name + '", "ip":"' + str(ip_cliente) + '", "port": "'
-                              + str(port_cliente) + '"}]}').encode())
-                else:
-                    con.send('{"error": "Usuário não esta registrado"}'.encode())
-            elif "Encerrar" in msg.keys():
+                        response += ']}'
+                        con.send(response.encode())
+
+                    # Caso contrário, retorna só a primeira ocorrência
+                    elif name in clientes:
+                        con.send(('{"clients": [{"user":"' + name + '", "ip":"' + str(ip_cliente) + '", "port": "'
+                                  + str(port_cliente) + '"}]}').encode())
+                    else:
+                        con.send('{"error": "Usuário não esta registrado"}'.encode())
+                elif "Encerrar" in msg.keys():
+                    break
+            if not msg:
                 break
-        if not msg:
-            break
 
-    print('Finalizando conexao do cliente', client)
-    clientes.pop(client)
-    con.close()
+        print('Finalizando conexao do cliente', client)
+        clientes.pop(client)
+        con.close()
+    except Exception as e:
+        print("Error: " + str(e))
 
 
-while True:
-    con, client = tcp.accept()
-    thread = threading.Thread(target=in_communication, args=(client,con,))
-    thread.start()
+try:
+    while True:
+        con, client = tcp.accept()
+        thread = threading.Thread(target=in_communication, args=(client, con,))
+        thread.start()
+except KeyboardInterrupt as e:
+    print("Servidor finalizado pelo teclado")
+except Exception as e:
+    print("Error: " + str(e))

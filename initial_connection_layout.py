@@ -1,3 +1,4 @@
+import client
 from home_layout import *
 from tkinter import *
 from tkinter import messagebox
@@ -20,8 +21,7 @@ def start_connection():
         set_home(name.get())
 
     elif 'Usuário ja registrado' in resp:
-        messagebox.showinfo("Atenção", "Usuário já registrado. Tente outro nome.")
-        client.close_conn()
+        messagebox.showerror("Atenção", "Usuário já registrado - Conexão encerrada. Tente outro nome.")
 
     else:
         messagebox.showerror("Error", "Erro ao fazer requisição: " + resp)

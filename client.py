@@ -1,13 +1,15 @@
 import socket
 import threading
 
-tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 def listen_server(callback):
-    while True:
-        resp = tcp.recv(1024)
-        callback(resp.decode())
+    try:
+        while True:
+            resp = tcp.recv(1024)
+            callback(resp.decode())
+    except Exception as e:
+        print("Conexão finalizada")
 
 
 def start_listener(callback):
@@ -16,16 +18,23 @@ def start_listener(callback):
 
 
 def conn(username, server_ip):
+    global tcp
+    tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     HOST = server_ip
     print(HOST)
-    PORT = 5002
+    PORT = 5000
 
     dest = (HOST, PORT)
     tcp.connect(dest)
     tcp.send(('{"Registro":"' + username + '"}').encode())
 
     resp = tcp.recv(1024)
-    return resp.decode()
+    msg = resp.decode()
+    if 'Usuário ja registrado' in msg:
+        tcp.close()
+
+    return msg
 
 
 def search_user(username):
