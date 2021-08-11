@@ -1,5 +1,6 @@
 import json
 from tkinter import *
+from tkinter import messagebox
 import client as client
 
 
@@ -11,8 +12,11 @@ def event_callback(e):
             global last_users
             last_users = msg
             set_users_list()
-        if 'event' in msg:
+        elif 'event' in msg:
             search_user()
+        elif 'error' in msg:
+            messagebox.showerror("Error", msg['error'])
+
     except:
         log("Erro ao processar resposta do servidor")
 
@@ -42,7 +46,7 @@ def immediately(e):
             call_view_title.destroy()
             call_view_desc.destroy()
     except:
-        log("Erro ao recuperar informações da lista de clientes")
+        log("Adicionando dados a view")
 
     call_view_title = Label(window, text=last_users['clients'][index]['user'], background='white', fg='black',
                             font=("Arial", 20, "bold"))
