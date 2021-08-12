@@ -5,6 +5,11 @@ import client as client
 
 
 def event_callback(e):
+    """
+    É chamado pelo client sempre que se recebe uma resposta do servidor. Tem a responsabilidade de tidentificar o tipo
+    de resposta e tratar conforme necessário.
+    :param e: evento de resposta (Em geral é uma string representando a resposta do servidor já decodificada.
+    """
     log(e)
     try:
         msg = json.loads(e)
@@ -22,7 +27,10 @@ def event_callback(e):
 
 
 def search_user():
-    # Últimos usuários buscados
+    """
+    Chamando ao clicar no botão de busca.
+    Checa se existe algo no form field (Entry) de busca e chama os métodos do client de acordo com o dado recebido.
+    """
     if len(find_user.get()) == 0:
         client.get_all_users()
     else:
@@ -30,12 +38,19 @@ def search_user():
 
 
 def close_conn():
+    """
+    Chamando ao clicar no botão de sair.
+    Solicita fechamento de conexão.
+    """
     client.close_conn()
     exit(0)
 
 
-# Callback de event do click no listBox
 def immediately(e):
+    """
+    Callback de eventos do listBox.
+    Chamado automaticamente quando um usuário da lista é selecionado.
+    """
     index = lb_users.curselection()[0]
     global call_view_title
     global call_view_desc
@@ -58,6 +73,9 @@ def immediately(e):
 
 
 def set_users_list():
+    """
+    Atualiza lista de usuários
+    """
     global lb_users
     lb_users = Listbox(window, width=40, height=21, background='#ffffff', foreground='black')
     if last_users:
@@ -69,11 +87,18 @@ def set_users_list():
 
 
 def log(message):
+    """
+    Adiciona mensagem de log ao logcat
+    :param message: Messagem a ser adicionada
+    """
     global lb_logcat
     lb_logcat.insert(END, message)
 
 
 def set_logcat():
+    """
+    Definindo logcat na interface
+    """
     global lb_logcat
     lb_logcat = Listbox(window, width=77, height=5, background='black', foreground='white')
     lb_logcat.insert(END, "Log:")
@@ -81,6 +106,11 @@ def set_logcat():
 
 
 def set_home(username=""):
+    """
+    Entry Point da home.
+    Responsável por implementar toda a estrutura da interface gráfica
+    :param username: Nome do usuário conectado
+    """
     global window
     window = Toplevel()
     window.geometry("800x740")

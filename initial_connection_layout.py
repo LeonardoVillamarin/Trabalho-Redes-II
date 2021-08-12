@@ -5,12 +5,19 @@ from tkinter import messagebox
 
 
 def valid_information():
+    """
+    Valida as informações que estão nos campos para não permitir conexões com campos vazios.
+    :return: Booleano representando se as informações são válidas ou não.
+    """
     if len(name.get()) > 0 and len(ip.get()) > 0:
         return True
     return False
 
 
 def start_connection():
+    """
+    Solicita ao client a conexão de um novo usuário.
+    """
     if not valid_information():
         messagebox.showerror("Error", "Preencha todas as informações solicitadas.")
         return
@@ -27,6 +34,10 @@ def start_connection():
         messagebox.showerror("Error", "Erro ao fazer requisição: " + resp)
 
 
+"""
+Interface gráfica da tela inicial.
+Obs: Pode variar de acordo com o SO.
+"""
 window = Tk()
 window.geometry("530x600")
 window.configure(background='#EFEFEF')
@@ -60,7 +71,7 @@ desc.place(x=40, y=440)
 name = Entry(window, width=50, bg="white", fg="black", bd=1)
 name.place(x=40, y=470)
 
-# Todo: Botão com uma borda zoada d+. Preciso descobrir de onde isso vem.
+# Todo: Botão com uma borda. Preciso descobrir de onde isso vem e remover.
 button = Button(window, text="Conectar", command=start_connection, background='#EFEFEF', activeforeground='#EFEFEF', bd=0,
                 bg='#EFEFEF', highlightcolor='#EFEFEF')
 button.place(x=220, y=550)

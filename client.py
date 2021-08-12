@@ -3,6 +3,11 @@ import threading
 
 
 def listen_server(callback):
+    """
+    Responsável por escutar todas as respostas do servidor (Apenas depois da conexão ser estabelecida).
+    :param callback: Função passada como parâmetro pela view. Esta é uma forma de retornar a mensagem a view sem gerar
+    dependência circular.
+    """
     try:
         while True:
             resp = tcp.recv(1024)
@@ -12,11 +17,22 @@ def listen_server(callback):
 
 
 def start_listener(callback):
+    """
+    Inicia thread com método responsável pela escuta das respostas do servidor. É feita em uma thread separada para não
+    bloquear o fluxo de execução principal da aplicação
+    :param callback: Função passada como parâmetro pela view para exibir retornos do servidor.
+    """
     thread = threading.Thread(target=listen_server, args=(callback,))
     thread.start()
 
 
 def conn(username, server_ip):
+    """
+    Solicita ao servidor o início de uma nova conexão.
+    :param username: Nome do novo usuário
+    :param server_ip: Ip do servidor
+    :return Resposta do servidor para solicitação de nova conexão
+    """
     global tcp
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -37,16 +53,27 @@ def conn(username, server_ip):
 
 
 def search_user(username):
+    """
+    Realiza busca no servidor a procura de determinado usuário
+    :param username: Nome do usuário que se deseja encontrar (Chave da busca)
+    """
     msg = '{"Consulta":"' + username + '"}'
     tcp.send(msg.encode())
 
 
 def get_all_users():
+    """
+    Retorna todos os usuários com conexões ativas.
+    """
     msg = '{"Consulta":"''"}'
     tcp.send(msg.encode())
 
 
 def close_conn(username=" "):
+    """
+    Encerra a conexão de um usuário
+    :param username: Nome do usuário que se deseja encerrar a conexão
+    """
     try:
         tcp.send(('{"Encerrar":"' + username + '"}').encode())
         tcp.close()

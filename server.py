@@ -2,7 +2,7 @@ import socket
 import json
 import threading
 
-HOST = '127.0.0.1'  # Endereco IP do Servidor
+HOST = '25.90.35.163'  # Endereco IP do Servidor
 PORT = 5000  # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 orig = (HOST, PORT)
@@ -15,6 +15,11 @@ print("Servidor Iniciado")
 
 
 def sendall(origin, msg):
+    """
+    Envia uma mensagem de evento para todos os clientes, exceto, o cliente de origem.
+    :param origin: Cliente que originou o evento
+    :param msg: Texto da mensagem
+    """
     try:
         for cl in clientes:
             if cl != origin:
@@ -24,6 +29,11 @@ def sendall(origin, msg):
 
 
 def in_communication(client, con):
+    """
+    Executado após uma conexão ser estabelecida. Responsável por gerenciar as requições no servidor.
+    :param client: Ip e Porta do current client
+    :param con: Objeto de socket da conexão atual
+    """
     try:
         ip_cliente = client[0]
         port_cliente = client[1]
@@ -78,7 +88,7 @@ def in_communication(client, con):
                 break
 
         for key, value in clientes.items():
-            if(value == [ip_cliente, port_cliente, con]):
+            if (value == [ip_cliente, port_cliente, con]):
                 print('Finalizando conexao do cliente', key)
                 clientes.pop(key)
                 sendall(key, " saiu!")
@@ -90,6 +100,9 @@ def in_communication(client, con):
 
 
 try:
+    """
+    Main loop do servidor. Fica aguardando novas conexões e abre uma nova thread para cada client conectado
+    """
     while True:
         con, client = tcp.accept()
         thread = threading.Thread(target=in_communication, args=(client, con,))
