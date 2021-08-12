@@ -16,9 +16,9 @@ print("Servidor Iniciado")
 
 def sendall(origin, msg):
     try:
-        for client in clientes:
-            if client != origin:
-                clientes.get(client)[2].send(('{"event": "' + origin + msg + '"}').encode())
+        for cl in clientes:
+            if cl != origin:
+                clientes.get(cl)[2].send(('{"event": "' + origin + msg + '"}').encode())
     except Exception as e:
         print("SendAll error: " + str(e))
 
@@ -54,9 +54,9 @@ def in_communication(client, con):
                     if len(name) == 0:
                         i = 0
                         response = '{"clients": ['
-                        for client in clientes:
-                            response += '{"user":"' + client + '", "ip":"' + clientes.get(client)[0] + '", "port": "' \
-                                        + str(clientes.get(client)[1])
+                        for obj in clientes:
+                            response += '{"user":"' + obj + '", "ip":"' + clientes.get(obj)[0] + '", "port": "' \
+                                        + str(clientes.get(obj)[1])
                             if i == len(clientes) - 1:
                                 response += '"}'
                             else:
@@ -77,10 +77,14 @@ def in_communication(client, con):
             if not msg:
                 break
 
-        print('Finalizando conexao do cliente', client)
-        clientes.pop(client)
-        sendall(client, " saiu!")
-        con.close()
+        for key, value in clientes.items():
+            if(value == [ip_cliente, port_cliente, con]):
+                print('Finalizando conexao do cliente', key)
+                clientes.pop(key)
+                sendall(key, " saiu!")
+                con.close()
+                break
+
     except Exception as e:
         print("Error: " + str(e))
 
