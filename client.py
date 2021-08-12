@@ -2,7 +2,6 @@ import socket
 import threading
 
 
-
 def listen_server(callback):
     try:
         while True:

@@ -14,11 +14,11 @@ clientes = {}
 print("Servidor Iniciado")
 
 
-def sendall(origin):
+def sendall(origin, msg):
     try:
         for client in clientes:
             if client != origin:
-                clientes.get(client)[2].send(('{"event": "' + origin + ' está online!"}').encode())
+                clientes.get(client)[2].send(('{"event": "' + origin + msg + '"}').encode())
     except Exception as e:
         print("SendAll error: " + str(e))
 
@@ -40,7 +40,7 @@ def in_communication(client, con):
                         clientes[name] = [ip_cliente, port_cliente, con]
                         con.send("Novo registro efetuado".encode())
                         print(clientes)
-                        sendall(name)
+                        sendall(name, " está online!")
                     else:
                         con.send(("Usuário ja registrado").encode())
                         con.close()
@@ -79,6 +79,7 @@ def in_communication(client, con):
 
         print('Finalizando conexao do cliente', client)
         clientes.pop(client)
+        sendall(client, " saiu!")
         con.close()
     except Exception as e:
         print("Error: " + str(e))
