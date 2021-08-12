@@ -8,8 +8,9 @@ Alunos: João Victor Simonassi e Leonardo Villamarin.
 
 	Para executar este projeto é necessário ter a versão 3.x ou superior do python instalada em sua máquina.
 
-1 - Abra o terminal no local em que estão os arquivos.
-2 - Para executar o servidor, execute:
+1 - Abra o terminal no local em que estão os arquivos do projeto.
+
+2 - Para iniciar o servidor, execute:
 
 	python3 server.py
 
@@ -17,7 +18,7 @@ Alunos: João Victor Simonassi e Leonardo Villamarin.
 
 	python3 initial_connection_layout.py
 
-Obs: O comando python3 pode ser diferente de acordo com a versão do python instalada, SO e variáveis de ambiente.
+Obs: O comando python3 pode variar de acordo com a versão do python instalada, SO e variáveis de ambiente.
 <hr/>
 
 ### A documentação completa está disponível em:
