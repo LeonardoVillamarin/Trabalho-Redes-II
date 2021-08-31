@@ -1,4 +1,3 @@
-import client
 from home_layout import *
 from tkinter import *
 from tkinter import messagebox

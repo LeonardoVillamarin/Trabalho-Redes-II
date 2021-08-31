@@ -1,8 +1,10 @@
 import json
 from tkinter import *
 from tkinter import messagebox
-import client as client
 
+import call_server
+import client as client
+from call_server import *
 
 def event_callback(e):
     """
@@ -65,11 +67,11 @@ def immediately(e):
 
     call_view_title = Label(window, text=last_users['clients'][index]['user'], background='white', fg='black',
                             font=("Arial", 20, "bold"))
-    call_view_title.place(x=555, y=350)
+    call_view_title.place(x=500, y=400)
     call_view_desc = Label(window, text='IP: ' + last_users['clients'][index]['ip'] + 'Porta: ' +
                                         last_users['clients'][index]['port'], background='white', fg='black',
                            font=("Arial", 16))
-    call_view_desc.place(x=520, y=380)
+    call_view_desc.place(x=500, y=430)
 
 
 def set_users_list():
@@ -103,6 +105,16 @@ def set_logcat():
     lb_logcat = Listbox(window, width=77, height=5, background='black', foreground='white')
     lb_logcat.insert(END, "Log:")
     lb_logcat.place(x=40, y=600)
+
+
+def init_call():
+    global call_window
+    call_window = Toplevel()
+    call_window.geometry("300x300")
+    window.configure(background='#EFEFEF')
+    window.title("Realizando chamada")
+    call_server.start_protocol()
+    call_window.mainloop()
 
 
 def set_home(username=""):
@@ -142,6 +154,9 @@ def set_home(username=""):
                     bd=0,
                     bg='red', highlightcolor='#EFEFEF')
     button.place(x=700, y=10)
+
+    button = Button(window, text="Chamar", command=init_call, bd=0, width=27, bg='red', highlightcolor='#EFEFEF')
+    button.place(x=460, y=535)
 
     set_logcat()
     search_user()
