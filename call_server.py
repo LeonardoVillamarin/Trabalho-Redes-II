@@ -12,6 +12,10 @@ def init_call_server(current_ip, callback):
     orig = (HOST, PORT)
     udp.bind(orig)
     print("Iniciando servidor")
+
+    py_audio = pyaudio.PyAudio()
+    buffer = 1024  # 127.0.0.1
+
     while True:
         msg, client = udp.recvfrom(1024)
         print(client, msg.decode())
@@ -20,13 +24,19 @@ def init_call_server(current_ip, callback):
             resp = input("Você recebeu um convite de chamada. Deseja aceitar? (S/N)")
             if "s" in resp or "S" in resp:
                 udp.sendto("resposta_ao_convite/aceito".encode(), client)
-                # TODO: Enviar audio
             else:
                 udp.sendto("resposta_ao_convite/rejeitado".encode(), client)
 
         elif "encerrar_ligacao" in msg.decode():
             # TODO: Para de enviar o audio. A conexão não deve ser encerrada aqui
             udp.close()
+
+        else:
+            print("Recebendo audio!")
+            # Se não é nenhuma das opações acima, então é audio que tá chegando. Preciso reproduzir.
+            output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2, frames_per_buffer=buffer)
+            output_stream.write(msg)
+
 
 # def start_protocol(current_client, target_client):
 #     print("Iniciando chamada de " + str(current_client) + " para: " + str(target_client))
