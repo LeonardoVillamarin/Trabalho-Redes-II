@@ -56,6 +56,7 @@ def immediately(e):
     Callback de eventos do listBox.
     Chamado automaticamente quando um usuário da lista é selecionado.
     """
+    print("LB USERS: " + str(lb_users))
     index = lb_users.curselection()[0]
     global call_view_title
     global call_view_desc
@@ -122,7 +123,7 @@ def init_call():
     call_window.mainloop()
 
 
-def set_home(username=""):
+def set_home(current_ip, username=""):
     """
     Entry Point da home.
     Responsável por implementar toda a estrutura da interface gráfica
@@ -166,5 +167,5 @@ def set_home(username=""):
 
     set_logcat()
     search_user()
-    client.start_listener(event_callback)
+    client.start_listener(current_ip, event_callback)
     window.mainloop()

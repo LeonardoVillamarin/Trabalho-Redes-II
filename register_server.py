@@ -2,8 +2,8 @@ import socket
 import json
 import threading
 
-HOST = '127.0.0.1'  # Endereco IP do Servidor
-PORT = 5000  # Porta que o Servidor esta
+HOST = '25.90.35.163'  # Endereco IP do Servidor
+PORT = 5001  # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 orig = (HOST, PORT)
 tcp.bind(orig)
@@ -48,7 +48,7 @@ def in_communication(client, con):
                     name = msg.get("Registro")
                     if name not in clientes:
                         clientes[name] = [ip_cliente, port_cliente, con]
-                        con.send("Novo registro efetuado".encode())
+                        con.send(("Novo registro efetuado/" + ip_cliente).encode())
                         print(clientes)
                         sendall(name, " está online!")
                     else:

@@ -5,8 +5,8 @@ from time import sleep
 import socket
 
 
-def init_call_server(callback):
-    HOST = '127.0.0.1'
+def init_call_server(current_ip, callback):
+    HOST = current_ip
     PORT = 6000
     udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     orig = (HOST, PORT)

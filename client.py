@@ -17,7 +17,7 @@ def listen_server(callback):
         print("Conexão finalizada")
 
 
-def start_listener(callback):
+def start_listener(current_ip, callback):
     """
     Inicia thread com método responsável pela escuta das respostas do servidor. É feita em uma thread separada para não
     bloquear o fluxo de execução principal da aplicação
@@ -30,7 +30,7 @@ def start_listener(callback):
     Inicia servidor de ligação e fica esperando chamadas
     :param callback: Função passada como parâmetro pela view para exibir retornos do servidor.
     """
-    thread = threading.Thread(target=call_server.init_call_server, args=(callback,))
+    thread = threading.Thread(target=call_server.init_call_server, args=(current_ip, callback,))
     thread.start()
 
 
@@ -46,7 +46,7 @@ def conn(username, server_ip):
 
     HOST = server_ip
     print(HOST)
-    PORT = 5000
+    PORT = 5001
 
     dest = (HOST, PORT)
     tcp.connect(dest)
