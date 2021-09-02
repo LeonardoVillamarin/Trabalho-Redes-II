@@ -21,7 +21,7 @@ def send_message(msg, udp, dest):
 
 def send_audio(udp, dest):
     py_audio = pyaudio.PyAudio()
-    buffer = 1024
+    buffer = 512
 
     #output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2, frames_per_buffer=buffer)
     input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=2, frames_per_buffer=buffer)
@@ -39,7 +39,8 @@ def listen(udp):
     while True:
         msg, addrress = udp.recvfrom(1024)
         print("Recebi essa mensagem: " + str(msg) + " Veio desse endereço: " + str(addrress))
-        if "aceito" in msg:
+        #TODO: Os pacotes de audio devem chegar aqui tbm, tratar isso no futuro
+        if "aceito" in str(msg):
             print("Iniciando chamada")
             thread = threading.Thread(target=send_audio, args=(udp, addrress,))
             thread.start()

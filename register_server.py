@@ -1,113 +1,92 @@
-import socket
-import json
+import pyaudio
 import threading
+from time import sleep
 
-HOST = '25.90.35.163'  # Endereco IP do Servidor
-PORT = 5001  # Porta que o Servidor esta
-tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-orig = (HOST, PORT)
-tcp.bind(orig)
-tcp.listen(5)
-
-clientes = {}
-
-print("Servidor Iniciado")
+import socket
 
 
-def sendall(origin, msg):
-    """
-    Envia uma mensagem de evento para todos os clientes, exceto, o cliente de origem.
-    :param origin: Cliente que originou o evento
-    :param msg: Texto da mensagem
-    """
-    try:
-        for cl in clientes:
-            if cl != origin:
-                clientes.get(cl)[2].send(('{"event": "' + origin + msg + '"}').encode())
-    except Exception as e:
-        print("SendAll error: " + str(e))
+def init_call_server(current_ip, callback):
+    HOST = current_ip
+    PORT = 6000
+    udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    orig = (HOST, PORT)
+    udp.bind(orig)
+    print("Iniciando servidor")
 
+    py_audio = pyaudio.PyAudio()
+    buffer = 1024
 
-def in_communication(client, con):
-    """
-    Executado após uma conexão ser estabelecida. Responsável por gerenciar as requições no servidor.
-    :param client: Ip e Porta do current client
-    :param con: Objeto de socket da conexão atual
-    """
-    try:
-        ip_cliente = client[0]
-        port_cliente = client[1]
-
-        while True:
-            msg = con.recv(1024).decode()
-
-            if "{" in msg:
-                msg = json.loads(msg)
-
-                if "Registro" in msg.keys():
-                    name = msg.get("Registro")
-                    if name not in clientes:
-                        clientes[name] = [ip_cliente, port_cliente, con]
-                        con.send(("Novo registro efetuado/" + ip_cliente).encode())
-                        print(clientes)
-                        sendall(name, " está online!")
-                    else:
-                        con.send(("Usuário ja registrado").encode())
-                        con.close()
-                        print('Usuário já registrado: ' + name + ' - A conexão foi finalizada.')
-                        return
-
-                elif "Consulta" in msg.keys():
-                    name = msg.get("Consulta")
-                    # se buscou com vazio, deve retornar todos os usuários
-                    # Todo: Melhorar a montagem desse json
-                    if len(name) == 0:
-                        i = 0
-                        response = '{"clients": ['
-                        for obj in clientes:
-                            response += '{"user":"' + obj + '", "ip":"' + clientes.get(obj)[0] + '", "port": "' \
-                                        + str(clientes.get(obj)[1])
-                            if i == len(clientes) - 1:
-                                response += '"}'
-                            else:
-                                response += '"},'
-                            i += 1
-
-                        response += ']}'
-                        con.send(response.encode())
-
-                    # Caso contrário, retorna só a primeira ocorrência
-                    elif name in clientes:
-                        con.send(('{"clients": [{"user":"' + name + '", "ip":"' + str(ip_cliente) + '", "port": "'
-                                  + str(port_cliente) + '"}]}').encode())
-                    else:
-                        con.send('{"error": "Usuário não esta registrado"}'.encode())
-                elif "Encerrar" in msg.keys():
-                    break
-            if not msg:
-                break
-
-        for key, value in clientes.items():
-            if (value == [ip_cliente, port_cliente, con]):
-                print('Finalizando conexao do cliente', key)
-                clientes.pop(key)
-                sendall(key, " saiu!")
-                con.close()
-                break
-
-    except Exception as e:
-        print("Error: " + str(e))
-
-
-try:
-    """
-    Main loop do servidor. Fica aguardando novas conexões e abre uma nova thread para cada client conectado
-    """
     while True:
-        con, client = tcp.accept()
-        thread = threading.Thread(target=in_communication, args=(client, con,))
-        thread.start()
-except KeyboardInterrupt as e:
-    print("Servidor finalizado pelo teclado")
-except Exception as e:
-    print("Error: " + str(e))
+        try:
+            msg, client = udp.recvfrom(1024)
+            print(client, msg.decode())
+            if "convite" in msg.decode():
+                # TODO: As perguntas devem ser feitas via interface gráfica
+                resp = input("Você recebeu um convite de chamada. Deseja aceitar? (S/N)")
+                if "s" in resp or "S" in resp:
+                    udp.sendto("resposta_ao_convite/aceito".encode(), client)
+                else:
+                    udp.sendto("resposta_ao_convite/rejeitado".encode(), client)
+
+            elif "encerrar_ligacao" in msg.decode():
+                # TODO: Para de enviar o audio. A conexão não deve ser ence
+
+                udp.close()
+
+            else:
+                print("Recebendo audio!")
+                # Se não é nenhuma das opações acima, então é audio que tá chegando. Preciso reproduzir.
+                output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2,
+                                              frames_per_buffer=buffer)
+                output_stream.write(msg)
+        except Exception as e:
+            # Do some job ex.
+            print("Overflow")
+
+# def start_protocol(current_client, target_client):
+#     print("Iniciando chamada de " + str(current_client) + " para: " + str(target_client))
+#     py_audio = pyaudio.PyAudio()
+#     buffer = 1024  # 127.0.0.1
+#
+#     output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2, frames_per_buffer=buffer)
+#     input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=2, frames_per_buffer=buffer)
+#
+#     thread = threading.Thread(target=record, args=(input_stream, buffer, output_st
+#     thread.start()
+#
+#     thread = threading.Thread(target=start_ring, args=(py_audio, buffer,))
+#     thread.start()
+#
+#
+# def record(input_stream, buffer, output_stream):
+#     print("Iniciando leitura do microfone")
+#     while True:
+#         data = input_stream.read(buffer)
+#         # print(data)
+#         # transport.write(data, another_client) #Enviar data
+#         # Output stream está sendo enviado apenas para teste. Deve ser removido no futuro.
+#         # output_stream.write(data) # Se der uma microfonia absurda, é pq tá funcionando
+#
+#
+# def start_ring(py_audio, buffer):
+#     print("Vou falar")
+#     ring_output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=2092, channels=2,
+#                                        frames_per_buffer=buffer)
+#     while True:
+#         for n in range(600):
+#             ring_output_stream.write("\x00\x30\x5a\x76\x7f\x76\x5a\x30\x00\xd0\xa6\x8a\x80\x8a\xa6\xd0")
+#         sleep(3)
+
+# TODO: Chamar esse método sempre que receber uma
+# def listen_audio(output_stream, data):
+#     output_stream.write(data)
+
+# TODO: Adicionar uns states pra cuidar do ciclo de vida dessas threads
+
+
+# port = randint(1000, 3000)
+# print("Working on port: ", port)
+
+# reactor.listenUDP(port, Client())
+# reactor.run()
+# start_protocol()
