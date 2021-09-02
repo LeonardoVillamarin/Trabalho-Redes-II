@@ -1,14 +1,13 @@
 import json
 from tkinter import *
 from tkinter import messagebox
-
-import call_server
+import call_manager
 import client as client
-from call_server import *
+
 
 def event_callback(e):
     """
-    É chamado pelo client sempre que se recebe uma resposta do servidor. Tem a responsabilidade de tidentificar o tipo
+    É chamado pelo client sempre que se recebe uma resposta do servidor. Tem a responsabilidade de identificar o tipo
     de resposta e tratar conforme necessário.
     :param e: evento de resposta (Em geral é uma string representando a resposta do servidor já decodificada.
     """
@@ -26,6 +25,10 @@ def event_callback(e):
 
     except:
         log("Erro ao processar resposta do servidor")
+
+
+def call_event_callback(e):
+    print("Call_event_callback" + e)
 
 
 def search_user():
@@ -56,6 +59,8 @@ def immediately(e):
     index = lb_users.curselection()[0]
     global call_view_title
     global call_view_desc
+    global call_btn
+    call_btn['state'] = "active"
 
     # Limpa valores antigos antes de atualizar
     try:
@@ -111,9 +116,9 @@ def init_call():
     global call_window
     call_window = Toplevel()
     call_window.geometry("300x300")
-    window.configure(background='#EFEFEF')
-    window.title("Realizando chamada")
-    call_server.start_protocol()
+    call_window.configure(background='#EFEFEF')
+    call_window.title("Realizando chamada")
+    call_manager.start_call("username", last_users['clients'][lb_users.curselection()[0]], call_event_callback)
     call_window.mainloop()
 
 
@@ -154,9 +159,10 @@ def set_home(username=""):
                     bd=0,
                     bg='red', highlightcolor='#EFEFEF')
     button.place(x=700, y=10)
-
-    button = Button(window, text="Chamar", command=init_call, bd=0, width=27, bg='red', highlightcolor='#EFEFEF')
-    button.place(x=460, y=535)
+    global call_btn
+    call_btn = Button(window, text="Chamar", command=init_call, bd=0, width=27, state="disabled",
+                      highlightcolor='#EFEFEF')
+    call_btn.place(x=460, y=535)
 
     set_logcat()
     search_user()

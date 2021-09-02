@@ -1,5 +1,6 @@
 import socket
 import threading
+import call_server
 
 
 def listen_server(callback):
@@ -23,6 +24,13 @@ def start_listener(callback):
     :param callback: Função passada como parâmetro pela view para exibir retornos do servidor.
     """
     thread = threading.Thread(target=listen_server, args=(callback,))
+    thread.start()
+
+    """
+    Inicia servidor de ligação e fica esperando chamadas
+    :param callback: Função passada como parâmetro pela view para exibir retornos do servidor.
+    """
+    thread = threading.Thread(target=call_server.init_call_server, args=(callback,))
     thread.start()
 
 
@@ -79,3 +87,7 @@ def close_conn(username=" "):
         tcp.close()
     except:
         print("______")
+
+
+def get_current_client():
+    return tcp

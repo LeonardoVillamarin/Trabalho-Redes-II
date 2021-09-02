@@ -5,6 +5,29 @@ from time import sleep
 import socket
 
 
+def init_call_server(callback):
+    HOST = '127.0.0.1'
+    PORT = 6000
+    udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    orig = (HOST, PORT)
+    udp.bind(orig)
+    print("Iniciando servidor")
+    while True:
+        msg, client = udp.recvfrom(1024)
+        print(client, msg.decode())
+        if "convite" in msg.decode():
+            # TODO: As perguntas devem ser feitas via interface gráfica
+            resp = input("Você recebeu um convite de chamada. Deseja aceitar? (S/N)")
+            if "s" in resp or "S" in resp:
+                udp.sendto("resposta_ao_convite/aceito".encode(), client)
+                # TODO: Enviar audio
+            else:
+                udp.sendto("resposta_ao_convite/rejeitado".encode(), client)
+
+        elif "encerrar_ligacao" in msg.decode():
+            # TODO: Para de enviar o audio. A conexão não deve ser encerrada aqui
+            udp.close()
+
 # def start_protocol(current_client, target_client):
 #     print("Iniciando chamada de " + str(current_client) + " para: " + str(target_client))
 #     py_audio = pyaudio.PyAudio()
@@ -39,27 +62,16 @@ import socket
 #             ring_output_stream.write("\x00\x30\x5a\x76\x7f\x76\x5a\x30\x00\xd0\xa6\x8a\x80\x8a\xa6\xd0")
 #         sleep(3)
 
-#TODO: Chamar esse método sempre que receber uma nova data do servidor
+# TODO: Chamar esse método sempre que receber uma nova data do servidor
 # def listen_audio(output_stream, data):
 #     output_stream.write(data)
 
-#TODO: Adicionar uns states pra cuidar do ciclo de vida dessas threads
+# TODO: Adicionar uns states pra cuidar do ciclo de vida dessas threads
 
 
-#port = randint(1000, 3000)
-#print("Working on port: ", port)
+# port = randint(1000, 3000)
+# print("Working on port: ", port)
 
 # reactor.listenUDP(port, Client())
 # reactor.run()
-#start_protocol()
-
-HOST = '127.0.0.1'              # Endereco IP do Servidor
-PORT = 6000            # Porta que o Servidor esta
-udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-orig = (HOST, PORT)
-udp.bind(orig)
-print("Começando servidor B!")
-while True:
-    msg, cliente = udp.recvfrom(1024)
-    print(cliente, msg.decode())
-udp.close()
+# start_protocol()
