@@ -37,7 +37,7 @@ def init_call_server(current_ip, callback):
 def answer_invitation(answer, dest):
     try:
         print("Resposta: " + answer)
-        udp.sendto(answer.encode(),dest)
+        udp.sendto(answer.encode(), tuple(dest))
     except Exception as e:
         print("Deu erro:" + str(e))
 

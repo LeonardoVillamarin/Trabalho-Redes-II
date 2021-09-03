@@ -191,7 +191,7 @@ def set_home(current_ip, username=""):
                     bg='red', highlightcolor='#EFEFEF')
     button.place(x=700, y=10)
     global call_btn
-    call_btn = Button(window, text="Chamar", command=receive_call_popup, bd=0, width=27, state="disabled",
+    call_btn = Button(window, text="Chamar", command=init_call, bd=0, width=27, state="disabled",
                       highlightcolor='#EFEFEF')
     call_btn.place(x=460, y=535)
 
