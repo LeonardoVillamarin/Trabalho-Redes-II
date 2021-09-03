@@ -37,13 +37,16 @@ def send_audio(udp, dest):
 
 def listen(udp):
     while True:
-        msg, addrress = udp.recvfrom(1024)
-        print("Recebi essa mensagem: " + str(msg) + " Veio desse endereço: " + str(addrress))
-        #TODO: Os pacotes de audio devem chegar aqui tbm, tratar isso no futuro
-        if "aceito" in str(msg):
-            print("Iniciando chamada")
-            thread = threading.Thread(target=send_audio, args=(udp, addrress,))
-            thread.start()
+        try:
+            msg, addrress = udp.recvfrom(1024)
+            print("Recebi essa mensagem: " + str(msg) + " Veio desse endereço: " + str(addrress))
+            #TODO: Os pacotes de audio devem chegar aqui tbm, tratar isso no futuro
+            if "aceito" in str(msg):
+                print("Iniciando chamada")
+                thread = threading.Thread(target=send_audio, args=(udp, addrress,))
+                thread.start()
+        except Exception as e:
+            print("Error: " + str(e))
 
 
 #TODO: Alguém precisa fechar esse tanto de thread aberta. Está gerendo travaentos ao encerrar o app.

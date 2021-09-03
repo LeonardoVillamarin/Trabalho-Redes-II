@@ -21,7 +21,7 @@ def init_call_server(current_ip, callback):
         print(client, msg.decode())
         if "convite" in msg.decode():
             json_resp = '{"convite":"' + str(msg) + '","client": "' + str(client) + '"}'
-            callback(json_resp) # Manda para view. Ela chama um método para responder
+            callback(json_resp)  # Manda para view. Ela chama um método para responder
 
         elif "encerrar_ligacao" in msg.decode():
             # TODO: Para de enviar o audio. A conexão não deve ser encerrada aqui

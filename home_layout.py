@@ -1,4 +1,5 @@
 import json
+from time import sleep
 from tkinter import *
 from tkinter import messagebox
 import call_manager
@@ -28,8 +29,8 @@ def event_callback(e):
             name = msg['convite'].split("/")[1]
             receive_call_popup(name, msg['client'])
 
-    except:
-        log("Erro ao processar resposta do servidor")
+    except Exception as e:
+        log("Erro ao processar resposta do servidor" + str(e))
 
 
 def call_event_callback(e):
@@ -137,10 +138,10 @@ def receive_call_popup(name="user", origin="('25.53.56.165', 57927)"):
     Label(call_window, text="Recebendo chamada de", background='#EFEFEF', fg='black', font=("Arial", 18)).pack(side="top")
     Label(call_window, text=name, background='#EFEFEF', fg='black', font=("Arial", 26, "bold")).pack()
 
-    photo_accept = PhotoImage(file="assets/images/accept_call_btn.png")
+    photo_accept = PhotoImage(master=call_window, file="assets/images/accept_call_btn.png")
     Button(call_window, text='Click Me !', image=photo_accept, command=lambda: answer_call(call_window, "aceito", origin)).place(x=90, y=100)
 
-    photo_reject = PhotoImage(file="assets/images/reject_call_btn.png")
+    photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
     Button(call_window, text='Click Me !', image=photo_reject, command=lambda: answer_call(call_window, "rejeitado", origin)).place(x=150, y=100)
     sounds.play_incoming_call_sound()
     call_window.mainloop()
