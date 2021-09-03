@@ -8,6 +8,7 @@ import socket
 def init_call_server(current_ip, callback):
     HOST = current_ip
     PORT = 6000
+    global udp
     udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     orig = (HOST, PORT)
     udp.bind(orig)
@@ -20,12 +21,8 @@ def init_call_server(current_ip, callback):
         msg, client = udp.recvfrom(1024)
         print(client, msg.decode())
         if "convite" in msg.decode():
-            # TODO: As perguntas devem ser feitas via interface gráfica
-            resp = input("Você recebeu um convite de chamada. Deseja aceitar? (S/N)")
-            if "s" in resp or "S" in resp:
-                udp.sendto("resposta_ao_convite/aceito".encode(), client)
-            else:
-                udp.sendto("resposta_ao_convite/rejeitado".encode(), client)
+            json_resp = '{"convite":"' + str(msg) + '","client": "' + str(client) + '"}'
+            callback(json_resp) # Manda para view. Ela chama um método para responder
 
         elif "encerrar_ligacao" in msg.decode():
             # TODO: Para de enviar o audio. A conexão não deve ser encerrada aqui
@@ -36,6 +33,12 @@ def init_call_server(current_ip, callback):
             # Se não é nenhuma das opações acima, então é audio que tá chegando. Preciso reproduzir.
             output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2, frames_per_buffer=buffer)
             output_stream.write(msg)
+
+
+def answer_invitation(answer, dest):
+    print("Resposta: " + answer)
+
+
 
 
 # def start_protocol(current_client, target_client):

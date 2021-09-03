@@ -22,6 +22,9 @@ def event_callback(e):
             search_user()
         elif 'error' in msg:
             messagebox.showerror("Error", msg['error'])
+        elif 'convite' in msg:
+            name = msg['convite'].split("/")[1]
+            receive_call_popup(name, msg['client'])
 
     except:
         log("Erro ao processar resposta do servidor")
@@ -119,7 +122,18 @@ def init_call():
     call_window.geometry("300x300")
     call_window.configure(background='#EFEFEF')
     call_window.title("Realizando chamada")
-    call_manager.start_call("username", last_users['clients'][lb_users.curselection()[0]], call_event_callback)
+    call_manager.start_call(current_user, last_users['clients'][lb_users.curselection()[0]], call_event_callback)
+    call_window.mainloop()
+
+
+def receive_call_popup(name, origin):
+    global call_window
+    call_window = Toplevel()
+    call_window.geometry("300x300")
+    call_window.configure(background='#EFEFEF')
+    call_window.title("Recebendo chamada")
+    desc = Label(call_window, text="Recebendo chamada de " + name, background='#EFEFEF', fg='black', font=("Arial", 18))
+    desc.place(x=40, y=40)
     call_window.mainloop()
 
 
@@ -127,9 +141,12 @@ def set_home(current_ip, username=""):
     """
     Entry Point da home.
     Responsável por implementar toda a estrutura da interface gráfica
+    :param current_ip: Ip atual
     :param username: Nome do usuário conectado
     """
     global window
+    global current_user
+    current_user = username
     window = Toplevel()
     window.geometry("800x740")
     window.configure(background='#EFEFEF')

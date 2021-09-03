@@ -11,7 +11,7 @@ def start_call(origin, dest_server, callback):
     dest = (HOST, PORT)
     thread = threading.Thread(target=listen, args=(udp,))
     thread.start()
-    send_message("convite/" + origin + "IP/PORTA", udp, dest)
+    send_message(("convite/" + origin), udp, dest)
 
 
 def send_message(msg, udp, dest):
