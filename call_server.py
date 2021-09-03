@@ -1,7 +1,6 @@
 import pyaudio
 import threading
 from time import sleep
-
 import socket
 
 
@@ -36,7 +35,12 @@ def init_call_server(current_ip, callback):
 
 
 def answer_invitation(answer, dest):
-    print("Resposta: " + answer)
+    try:
+        print("Resposta: " + answer)
+        udp.sendto(answer.encode(),dest)
+    except Exception as e:
+        print("Deu erro:" + str(e))
+
 
 
 

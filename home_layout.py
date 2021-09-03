@@ -2,7 +2,9 @@ import json
 from tkinter import *
 from tkinter import messagebox
 import call_manager
+import call_server
 import client as client
+import sounds
 
 
 def event_callback(e):
@@ -126,15 +128,28 @@ def init_call():
     call_window.mainloop()
 
 
-def receive_call_popup(name, origin):
+def receive_call_popup(name="user", origin="('25.53.56.165', 57927)"):
     global call_window
     call_window = Toplevel()
-    call_window.geometry("300x300")
+    call_window.geometry("300x180")
     call_window.configure(background='#EFEFEF')
     call_window.title("Recebendo chamada")
-    desc = Label(call_window, text="Recebendo chamada de " + name, background='#EFEFEF', fg='black', font=("Arial", 18))
-    desc.place(x=40, y=40)
+    Label(call_window, text="Recebendo chamada de", background='#EFEFEF', fg='black', font=("Arial", 18)).pack(side="top")
+    Label(call_window, text=name, background='#EFEFEF', fg='black', font=("Arial", 26, "bold")).pack()
+
+    photo_accept = PhotoImage(file="assets/images/accept_call_btn.png")
+    Button(call_window, text='Click Me !', image=photo_accept, command=lambda: answer_call(call_window, "aceito", origin)).place(x=90, y=100)
+
+    photo_reject = PhotoImage(file="assets/images/reject_call_btn.png")
+    Button(call_window, text='Click Me !', image=photo_reject, command=lambda: answer_call(call_window, "rejeitado", origin)).place(x=150, y=100)
+    sounds.play_incoming_call_sound()
     call_window.mainloop()
+
+
+def answer_call(popup, answer, origin):
+    sounds.stop_incoming_call_sound()
+    popup.destroy()
+    call_server.answer_invitation(answer, origin)
 
 
 def set_home(current_ip, username=""):
@@ -152,14 +167,12 @@ def set_home(current_ip, username=""):
     window.configure(background='#EFEFEF')
     window.title("Calls UFF")
 
-    desc = Label(window, text="Olá, " + username.split(" ")[0].strip() + '.', background='#EFEFEF', fg='black',
-                 font=("Arial", 24, "bold"))
-    desc.place(x=40, y=40)
-    desc = Label(window, text="Com quem vamos falar hoje?", background='#EFEFEF', fg='black', font=("Arial", 20))
-    desc.place(x=40, y=70)
+    Label(window, text="Olá, " + username.split(" ")[0].strip() + '.', background='#EFEFEF', fg='black',
+                 font=("Arial", 24, "bold")).place(x=40, y=40)
+    Label(window, text="Com quem vamos falar hoje?", background='#EFEFEF', fg='black', font=("Arial", 20))\
+        .place(x=40, y=70)
 
-    desc = Label(window, text="Nome do usuário: ", background='#EFEFEF', fg='black', font=("Arial", 16))
-    desc.place(x=40, y=115)
+    Label(window, text="Nome do usuário: ", background='#EFEFEF', fg='black', font=("Arial", 16)).place(x=40, y=115)
     global find_user
     find_user = Entry(window, width=30, bg="white", fg="black", bd=1)
     find_user.place(x=40, y=140)
@@ -178,7 +191,7 @@ def set_home(current_ip, username=""):
                     bg='red', highlightcolor='#EFEFEF')
     button.place(x=700, y=10)
     global call_btn
-    call_btn = Button(window, text="Chamar", command=init_call, bd=0, width=27, state="disabled",
+    call_btn = Button(window, text="Chamar", command=receive_call_popup, bd=0, width=27, state="disabled",
                       highlightcolor='#EFEFEF')
     call_btn.place(x=460, y=535)
 
