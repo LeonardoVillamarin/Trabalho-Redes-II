@@ -17,10 +17,11 @@ def listen_server(callback):
         print("Conexão finalizada")
 
 
-def start_listener(current_ip, callback):
+def start_listener(current_ip, callback, window):
     """
     Inicia thread com método responsável pela escuta das respostas do servidor. É feita em uma thread separada para não
     bloquear o fluxo de execução principal da aplicação
+    :param window: GUI tkinter
     :param callback: Função passada como parâmetro pela view para exibir retornos do servidor.
     """
     thread = threading.Thread(target=listen_server, args=(callback,))
@@ -30,7 +31,7 @@ def start_listener(current_ip, callback):
     Inicia servidor de ligação e fica esperando chamadas
     :param callback: Função passada como parâmetro pela view para exibir retornos do servidor.
     """
-    thread = threading.Thread(target=call_server.init_call_server, args=(current_ip, callback,))
+    thread = threading.Thread(target=call_server.init_call_server, args=(current_ip, callback, window,))
     thread.start()
 
 

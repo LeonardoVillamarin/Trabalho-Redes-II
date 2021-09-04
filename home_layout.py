@@ -129,7 +129,16 @@ def init_call():
     call_window.mainloop()
 
 
-def receive_call_popup(name="user", origin="('25.53.56.165', 57927)"):
+def receive_call_popup(name="user", origin="('25.53.56.165', 57927)", **kwargs):
+    print("Kwargs: " + str(kwargs))
+    for key, value in kwargs.items():
+        print("Key: " + str(key))
+        print("Value: " + str(value))
+
+
+    print("VEIO ESSE NAME: " + str(name))
+    print("VEIO ESSE ORIGIN: " + str(origin))
+
     global call_window
     call_window = Toplevel()
     call_window.geometry("300x180")
@@ -143,7 +152,7 @@ def receive_call_popup(name="user", origin="('25.53.56.165', 57927)"):
 
     photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
     Button(call_window, text='Click Me !', image=photo_reject, command=lambda: answer_call(call_window, "rejeitado", origin)).place(x=150, y=100)
-    sounds.play_incoming_call_sound()
+    # sounds.play_incoming_call_sound()
     call_window.mainloop()
 
 
@@ -198,5 +207,6 @@ def set_home(current_ip, username=""):
 
     set_logcat()
     search_user()
-    client.start_listener(current_ip, event_callback)
+    client.start_listener(current_ip, event_callback, window)
+    window.bind("<<newCall>>", receive_call_popup)
     window.mainloop()

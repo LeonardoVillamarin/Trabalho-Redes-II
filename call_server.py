@@ -1,10 +1,12 @@
+import time
+
 import pyaudio
-import threading
-from time import sleep
 import socket
+from tkinter import *
+import sounds
 
 
-def init_call_server(current_ip, callback):
+def init_call_server(current_ip, callback, window):
     HOST = current_ip
     PORT = 6000
     global udp
@@ -15,7 +17,8 @@ def init_call_server(current_ip, callback):
 
     py_audio = pyaudio.PyAudio()
     buffer = 1024  # 127.0.0.1
-
+    time.sleep(2)
+    window.event_generate("<<newCall>>", data="params") #Todo: How send params to gui?
     while True:
         msg, client = udp.recvfrom(1024)
         print(client, msg.decode())
@@ -42,7 +45,22 @@ def answer_invitation(answer, dest):
         print("Deu erro:" + str(e))
 
 
+def receive_call_popup(name="user", origin="('25.53.56.165', 57927)"):
+    global call_window
+    call_window = Toplevel()
+    call_window.geometry("300x180")
+    call_window.configure(background='#EFEFEF')
+    call_window.title("Recebendo chamada")
+    Label(call_window, text="Recebendo chamada de", background='#EFEFEF', fg='black', font=("Arial", 18)).pack(side="top")
+    Label(call_window, text=name, background='#EFEFEF', fg='black', font=("Arial", 26, "bold")).pack()
 
+    # photo_accept = PhotoImage(master=call_window, file="assets/images/accept_call_btn.png")
+    # Button(call_window, text='Click Me !', image=photo_accept, command=lambda: answer_call(call_window, "aceito", origin)).place(x=90, y=100)
+
+    # photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
+    # Button(call_window, text='Click Me !', image=photo_reject, command=lambda: answer_call(call_window, "rejeitado", origin)).place(x=150, y=100)
+    sounds.play_incoming_call_sound()
+    call_window.mainloop()
 
 
 # def start_protocol(current_client, target_client):
