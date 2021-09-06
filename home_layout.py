@@ -25,9 +25,6 @@ def event_callback(e):
             search_user()
         elif 'error' in msg:
             messagebox.showerror("Error", msg['error'])
-        elif 'convite' in msg:
-            name = msg['convite'].split("/")[1]
-            receive_call_popup(name, msg['client'])
 
     except Exception as e:
         log("Erro ao processar resposta do servidor" + str(e))
@@ -129,15 +126,9 @@ def init_call():
     call_window.mainloop()
 
 
-def receive_call_popup(name="user", origin="('25.53.56.165', 57927)", **kwargs):
-    print("Kwargs: " + str(kwargs))
-    for key, value in kwargs.items():
-        print("Key: " + str(key))
-        print("Value: " + str(value))
-
-
-    print("VEIO ESSE NAME: " + str(name))
-    print("VEIO ESSE ORIGIN: " + str(origin))
+def receive_call_popup(call_server_obj):
+    print("Recebendo chamada deste cliente:: " + str(call_server_obj.current_client))
+    origin = {"ip": call_server_obj.current_client["ip"], "port": call_server_obj.current_client["port"]}
 
     global call_window
     call_window = Toplevel()
@@ -145,21 +136,21 @@ def receive_call_popup(name="user", origin="('25.53.56.165', 57927)", **kwargs):
     call_window.configure(background='#EFEFEF')
     call_window.title("Recebendo chamada")
     Label(call_window, text="Recebendo chamada de", background='#EFEFEF', fg='black', font=("Arial", 18)).pack(side="top")
-    Label(call_window, text=name, background='#EFEFEF', fg='black', font=("Arial", 26, "bold")).pack()
+    Label(call_window, text=call_server_obj.current_client["username"], background='#EFEFEF', fg='black', font=("Arial", 26, "bold")).pack()
 
     photo_accept = PhotoImage(master=call_window, file="assets/images/accept_call_btn.png")
-    Button(call_window, text='Click Me !', image=photo_accept, command=lambda: answer_call(call_window, "aceito", origin)).place(x=90, y=100)
+    Button(call_window, text='Click Me !', image=photo_accept, command=lambda: answer_call(call_server_obj, call_window, "aceito", origin)).place(x=90, y=100)
 
     photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
-    Button(call_window, text='Click Me !', image=photo_reject, command=lambda: answer_call(call_window, "rejeitado", origin)).place(x=150, y=100)
-    # sounds.play_incoming_call_sound()
+    Button(call_window, text='Click Me !', image=photo_reject, command=lambda: answer_call(call_server_obj, call_window, "rejeitado", origin)).place(x=150, y=100)
+    sounds.play_incoming_call_sound()
     call_window.mainloop()
 
 
-def answer_call(popup, answer, origin):
+def answer_call(call_server_obj, popup, answer, origin):
     sounds.stop_incoming_call_sound()
     popup.destroy()
-    call_server.answer_invitation(answer, origin)
+    call_server_obj.answer_invitation(answer, origin)
 
 
 def set_home(current_ip, username=""):
@@ -207,6 +198,8 @@ def set_home(current_ip, username=""):
 
     set_logcat()
     search_user()
-    client.start_listener(current_ip, event_callback, window)
-    window.bind("<<newCall>>", receive_call_popup)
+    #Todo: Abrir obj aqui
+    call_server_obj = call_server.CallServer(current_ip)
+    client.start_listener(call_server_obj, event_callback, window)
+    window.bind("<<newCall>>", receive_call_popup(call_server_obj))
     window.mainloop()

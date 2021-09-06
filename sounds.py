@@ -26,3 +26,13 @@ def play_incoming_call_sound():
 def stop_incoming_call_sound():
     global again
     again = False
+
+
+# def start_ring(py_audio, buffer):
+#     print("Vou falar")
+#     ring_output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=2092, channels=2,
+#                                        frames_per_buffer=buffer)
+#     while True:
+#         for n in range(600):
+#             ring_output_stream.write("\x00\x30\x5a\x76\x7f\x76\x5a\x30\x00\xd0\xa6\x8a\x80\x8a\xa6\xd0")
+#         sleep(3)
