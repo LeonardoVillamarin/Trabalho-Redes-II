@@ -10,7 +10,7 @@ class CallServer:
     def __init__(self, current_ip):
         self.current_client = {}
         HOST = current_ip
-        PORT = 6000
+        PORT = 6001
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         orig = (HOST, PORT)
         self.udp.bind(orig)
@@ -20,22 +20,26 @@ class CallServer:
         print("Iniciando servidor")
 
         py_audio = pyaudio.PyAudio()
-        buffer = 1024
+        buffer = 4096
+        output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2,
+                                      frames_per_buffer=buffer)
         while True:
-            msg, client = self.udp.recvfrom(4096)
-            print(client, msg.decode())
-            if "convite" in msg.decode():
+            print("Iniciando o listen")
+            msg, client = self.udp.recvfrom(buffer)
+            print(client, str(msg))
+            print("Vou testar com " + str(msg))
+            if "convite" in str(msg):
                 self.current_client = client
                 time.sleep(2)
+                print("Gerando event")
                 window.event_generate("<<newCall>>")
-            elif "encerrar_ligacao" in msg.decode():
+            elif "encerrar_ligacao" in str(msg):
                 # TODO: Para de enviar o audio. A conexão não deve ser encerrada aqui
                 self.udp.close()
             else:
                 print("Recebendo audio!")
                 # Se não é nenhuma das opações acima, então é audio que tá chegando. Preciso reproduzir.
-                output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2,
-                                              frames_per_buffer=buffer)
+
                 output_stream.write(msg)
 
     def answer_invitation(self, answer, dest):

@@ -30,10 +30,6 @@ def event_callback(e):
         log("Erro ao processar resposta do servidor" + str(e))
 
 
-def call_event_callback(e):
-    print("Call_event_callback" + e)
-
-
 def search_user():
     """
     Chamando ao clicar no botão de busca.
@@ -122,7 +118,7 @@ def init_call():
     call_window.geometry("300x300")
     call_window.configure(background='#EFEFEF')
     call_window.title("Realizando chamada")
-    call_manager.start_call(current_user, last_users['clients'][lb_users.curselection()[0]], call_event_callback)
+    call_manager.start_call(current_user, last_users['clients'][lb_users.curselection()[0]])
     call_window.mainloop()
 
 
@@ -205,5 +201,5 @@ def set_home(current_ip, username=""):
     #Todo: Abrir obj aqui
     call_server_obj = call_server.CallServer(current_ip)
     client.start_listener(call_server_obj, event_callback, window)
-    window.bind("<<newCall>>", receive_call_popup(call_server_obj))
+    # window.bind("<<newCall>>", receive_call_popup(call_server_obj))
     window.mainloop()

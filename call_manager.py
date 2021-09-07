@@ -3,7 +3,7 @@ import threading
 import pyaudio
 
 
-def start_call(origin, dest_server, callback):
+def start_call(origin, dest_server):
     print(" Destino: " + str(dest_server))
     HOST = dest_server['ip']
     PORT = 6000
