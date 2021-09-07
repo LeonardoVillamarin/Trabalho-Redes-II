@@ -11,7 +11,7 @@ class Sound:
     def _thread_call_sound(self):
         while self.need_play:
             global stream
-            myRates = [4185, 4700, 5275, 5590, 6270, 7040, 7900]
+            myRates = [4185, 7900, 5275, 7900, 6270, 7040, 7900]
             for v_rate in myRates:
                 stream = pyaudio.PyAudio().open(format=pyaudio.paInt8, channels=1, rate=v_rate, output=True)
                 for beep_num in range(0, 2):

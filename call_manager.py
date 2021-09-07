@@ -40,10 +40,10 @@ class CallManager:
 
                 if "rejeitado" in str(msg):
                     self.ring_sound_obj.stop_all_sounds()
-                    self.call_window.destroy()
+                    self.call_window_obj.destroy()
 
                 elif "encerra_ligacao" in str(msg):
-                    self.call_window.destroy()
+                    self.call_window_obj.destroy()
                     self.in_call = False
 
                 if self.in_call:
@@ -61,7 +61,7 @@ class CallManager:
 
         while self.in_call:
             print("Enviando audio!")
-            data = input_stream.read(buffer)
+            data = input_stream.read(buffer, exception_on_overflow=False)
             self.udp.sendto(data, dest)
 
         print("Hora de finalizar a chamada!")

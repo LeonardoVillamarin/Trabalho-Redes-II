@@ -65,7 +65,7 @@ class CallServer:
                                      frames_per_buffer=buffer)
         while self.in_call:
             print("Enviando audio!")
-            data = input_stream.read(buffer)
+            data = input_stream.read(buffer, exception_on_overflow = False)
             udp.sendto(data, dest)
 
         print("A chamada deve ser finalizada aqui!")
