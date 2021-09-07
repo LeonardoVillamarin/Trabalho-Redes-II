@@ -122,7 +122,7 @@ def init_call():
     call_window.mainloop()
 
 
-def receive_call_popup():
+def receive_call_popup(event):
     print("Recebendo chamada deste cliente: " + str(call_server_obj.current_client))
 
     if call_server_obj.current_client == {}:
