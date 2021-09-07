@@ -5,9 +5,10 @@ import threading
 
 
 class CallServer:
-    def __init__(self, current_ip):
+    def __init__(self, current_ip, sound_obj):
         self.current_client = {}
         self.in_call = False
+        self.sound_obj = sound_obj
         HOST = current_ip
         PORT = 6004
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -32,6 +33,7 @@ class CallServer:
                                        "port": int(client[1])}
                 time.sleep(2)
                 print("Gerando event")
+                self.sound_obj.play_incoming_call_sound()
                 thread = threading.Thread(target=window.event_generate, args=("<<newCall>>",))
                 thread.start()
                 print("depois do event")

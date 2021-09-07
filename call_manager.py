@@ -5,14 +5,16 @@ import pyaudio
 
 class CallManager:
 
-    def __init__(self, origin, dest_server, call_window):
+    def __init__(self, origin, dest_server, call_window, ring_sound):
         print(" Destino: " + str(dest_server))
         HOST = dest_server['ip']
         PORT = 6004
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.in_call = False
+        self.ring_sound_obj = ring_sound
+        self.call_window_obj = call_window
         dest = (HOST, PORT)
-        thread = threading.Thread(target=self.listen, args=(self.udp, call_window,))
+        thread = threading.Thread(target=self.listen, args=(self.udp,))
         thread.start()
         self.send_message(("convite/" + origin), dest)
 
@@ -20,7 +22,7 @@ class CallManager:
         print("Enviando mensagem: " + msg)
         self.udp.sendto(msg.encode(), dest)
 
-    def listen(self, udp, call_window):
+    def listen(self, udp):
         py_audio = pyaudio.PyAudio()
         buffer = 4096
         output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2,
@@ -32,13 +34,16 @@ class CallManager:
                 if "aceito" in str(msg):
                     print("Iniciando chamada")
                     self.in_call = True
+                    self.ring_sound_obj.stop_all_sounds()
                     thread = threading.Thread(target=self.send_audio, args=(addrress,))
                     thread.start()
 
                 if "rejeitado" in str(msg):
-                    call_window.destroy()
+                    self.ring_sound_obj.stop_all_sounds()
+                    self.call_window.destroy()
 
                 elif "encerra_ligacao" in str(msg):
+                    self.call_window.destroy()
                     self.in_call = False
 
                 if self.in_call:
@@ -60,6 +65,7 @@ class CallManager:
             self.udp.sendto(data, dest)
 
         print("Hora de finalizar a chamada!")
+        self.call_window_obj.destroy()
 
     def end_call(self):
         self.in_call = False
