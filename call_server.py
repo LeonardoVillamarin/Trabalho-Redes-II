@@ -58,15 +58,19 @@ class CallServer:
             print("Deu erro:" + str(e))
 
     def send_audio(self, udp, dest):
-        py_audio = pyaudio.PyAudio()
-        buffer = 1024
+        try:
+            py_audio = pyaudio.PyAudio()
+            buffer = 1024
 
-        input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=2,
-                                     frames_per_buffer=buffer)
-        while self.in_call:
-            print("Enviando audio!")
-            data = input_stream.read(buffer, exception_on_overflow = False)
-            udp.sendto(data, dest)
+            input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=2,
+                                         frames_per_buffer=buffer)
+            while self.in_call:
+                print("Enviando audio!")
+                data = input_stream.read(buffer, exception_on_overflow = False)
+                udp.sendto(data, dest)
 
-        print("A chamada deve ser finalizada aqui!")
+            print("A chamada deve ser finalizada aqui!")
+
+        except Exception as e:
+            print(str(e))
 

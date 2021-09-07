@@ -29,7 +29,7 @@ class CallManager:
                                       frames_per_buffer=buffer)
         while True:
             try:
-                msg, addrress = udp.recvfrom(1024)
+                msg, addrress = udp.recvfrom(buffer)
                 print("Recebi essa mensagem: " + str(msg) + " Veio desse endereço: " + str(addrress))
                 if "aceito" in str(msg):
                     print("Iniciando chamada")
@@ -53,19 +53,23 @@ class CallManager:
                 print("Error: " + str(e))
 
     def send_audio(self, dest):
-        py_audio = pyaudio.PyAudio()
-        buffer = 1024
+        try:
+            py_audio = pyaudio.PyAudio()
+            buffer = 1024
 
-        input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=2,
-                                     frames_per_buffer=buffer)
+            input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=2,
+                                         frames_per_buffer=buffer)
 
-        while self.in_call:
-            print("Enviando audio!")
-            data = input_stream.read(buffer, exception_on_overflow=False)
-            self.udp.sendto(data, dest)
+            while self.in_call:
+                print("Enviando audio!")
+                data = input_stream.read(buffer, exception_on_overflow=False)
+                self.udp.sendto(data, dest)
 
-        print("Hora de finalizar a chamada!")
-        self.call_window_obj.destroy()
+            print("Hora de finalizar a chamada!")
+            self.call_window_obj.destroy()
+
+        except Exception as e:
+            print(str(e))
 
     def end_call(self):
         self.in_call = False
