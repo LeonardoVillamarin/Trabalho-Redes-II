@@ -22,16 +22,15 @@ class CallServer:
         py_audio = pyaudio.PyAudio()
         buffer = 1024
         while True:
-            msg, client = self.udp.recvfrom(1024)
+            msg, client = self.udp.recvfrom(4096)
             print(client, msg.decode())
             if "convite" in msg.decode():
-                json_resp = '{"convite":"' + str(msg) + '","client": "' + str(client) + '"}'
-                callback(json_resp)  # Manda para view. Ela chama um método para responder
-
+                self.current_client = client
+                time.sleep(2)
+                window.event_generate("<<newCall>>", when="tail")
             elif "encerrar_ligacao" in msg.decode():
                 # TODO: Para de enviar o audio. A conexão não deve ser encerrada aqui
                 self.udp.close()
-
             else:
                 print("Recebendo audio!")
                 # Se não é nenhuma das opações acima, então é audio que tá chegando. Preciso reproduzir.
