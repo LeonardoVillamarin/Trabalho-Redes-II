@@ -116,7 +116,7 @@ def set_logcat():
 def init_call(incomming_call=False, origin="", username=""):
     global call_window
     call_window = Toplevel()
-    call_window.geometry("300x300")
+    call_window.geometry("300x200")
     call_window.configure(background='#EFEFEF')
     call_window.title("Realizando chamada")
     Label(call_window, text="Em ligação com", background='#EFEFEF', fg='black', font=("Arial", 18)).pack(
