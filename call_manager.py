@@ -5,14 +5,14 @@ import pyaudio
 
 class CallManager:
 
-    def __init__(self, origin, dest_server):
+    def __init__(self, origin, dest_server, call_window):
         print(" Destino: " + str(dest_server))
         HOST = dest_server['ip']
         PORT = 6004
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.in_call = False
         dest = (HOST, PORT)
-        thread = threading.Thread(target=self.listen, args=(self.udp,))
+        thread = threading.Thread(target=self.listen, args=(self.udp, call_window,))
         thread.start()
         self.send_message(("convite/" + origin), dest)
 
@@ -20,7 +20,7 @@ class CallManager:
         print("Enviando mensagem: " + msg)
         self.udp.sendto(msg.encode(), dest)
 
-    def listen(self, udp):
+    def listen(self, udp, call_window):
         py_audio = pyaudio.PyAudio()
         buffer = 4096
         output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2,
@@ -34,6 +34,9 @@ class CallManager:
                     self.in_call = True
                     thread = threading.Thread(target=self.send_audio, args=(addrress,))
                     thread.start()
+
+                if "rejeitado" in str(msg):
+                    call_window.destroy()
 
                 elif "encerra_ligacao" in str(msg):
                     self.in_call = False
