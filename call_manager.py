@@ -56,6 +56,9 @@ class CallManager:
             data = input_stream.read(buffer)
             self.udp.sendto(data, dest)
 
-        print("Ora de finalizar a chamada!")
+        print("Hora de finalizar a chamada!")
+
+    def end_call(self):
+        self.in_call = False
 
 # TODO: Alguém precisa fechar esse tanto de thread aberta. Está gerendo travaentos ao encerrar o app.

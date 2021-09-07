@@ -118,8 +118,18 @@ def init_call():
     call_window.geometry("300x300")
     call_window.configure(background='#EFEFEF')
     call_window.title("Realizando chamada")
+    Label(call_window, text="Ligando para", background='#EFEFEF', fg='black', font=("Arial", 18)).pack(
+        side="top")
+    Label(call_window, text=last_users['clients'][lb_users.curselection()[0]], background='#EFEFEF', fg='black',
+          font=("Arial", 26, "bold")).pack()
+
     #Todo: Se já existir call_manager, não é preciso criar um novo
     call_manager_obj = call_manager.CallManager(current_user, last_users['clients'][lb_users.curselection()[0]])
+
+    photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
+    Button(call_window, text='Click Me !', image=photo_reject,
+           command=call_manager_obj.end_call).place()
+
     call_window.mainloop()
 
 
