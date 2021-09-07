@@ -127,7 +127,10 @@ def init_call():
 
 
 def receive_call_popup(call_server_obj):
-    print("Recebendo chamada deste cliente:: " + str(call_server_obj.current_client))
+    if call_server_obj.current_client == {}:
+        return
+
+    print("Recebendo chamada deste cliente: " + str(call_server_obj.current_client))
     origin = {"ip": call_server_obj.current_client["ip"], "port": call_server_obj.current_client["port"]}
 
     global call_window
