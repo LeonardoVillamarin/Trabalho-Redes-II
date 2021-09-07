@@ -118,7 +118,8 @@ def init_call():
     call_window.geometry("300x300")
     call_window.configure(background='#EFEFEF')
     call_window.title("Realizando chamada")
-    call_manager.start_call(current_user, last_users['clients'][lb_users.curselection()[0]])
+    #Todo: Se já existir call_manager, não é preciso criar um novo
+    call_manager_obj = call_manager.CallManager(current_user, last_users['clients'][lb_users.curselection()[0]])
     call_window.mainloop()
 
 

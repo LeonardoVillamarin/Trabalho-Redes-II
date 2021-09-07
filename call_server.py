@@ -1,5 +1,4 @@
 import time
-
 import pyaudio
 import socket
 import threading
@@ -8,6 +7,7 @@ import threading
 class CallServer:
     def __init__(self, current_ip):
         self.current_client = {}
+        self.in_call = False
         HOST = current_ip
         PORT = 6004
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -28,16 +28,16 @@ class CallServer:
             print(client, str(msg))
             print("Vou testar com " + str(msg))
             if "convite" in str(msg):
-                self.current_client = {"username": msg.decode().split("/")[1], "ip": str(client[0]), "port": int(client[1])}
+                self.current_client = {"username": msg.decode().split("/")[1], "ip": str(client[0]),
+                                       "port": int(client[1])}
                 time.sleep(2)
                 print("Gerando event")
                 thread = threading.Thread(target=window.event_generate, args=("<<newCall>>",))
                 thread.start()
                 print("depois do event")
             elif "encerrar_ligacao" in str(msg):
-                # TODO: Para de enviar o audio. A conexão não deve ser encerrada aqui
+                self.in_call = False
                 print("Encerra ligação")
-                #self.udp.close()
             else:
                 print("Recebendo audio!")
                 output_stream.write(msg)
@@ -46,6 +46,25 @@ class CallServer:
         try:
             print("Resposta: " + answer)
             self.udp.sendto(answer.encode(), tuple([dest["ip"], dest["port"]]))
+
+            if 'aceito' in answer:
+                self.in_call = True
+                thread = threading.Thread(target=self.send_audio, args=(self.udp, tuple([dest["ip"], dest["port"]]),))
+                thread.start()
+
         except Exception as e:
             print("Deu erro:" + str(e))
+
+    def send_audio(self, udp, dest):
+        py_audio = pyaudio.PyAudio()
+        buffer = 1024
+
+        input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=2,
+                                     frames_per_buffer=buffer)
+        while self.in_call:
+            print("Enviando audio!")
+            data = input_stream.read(buffer)
+            udp.sendto(data, dest)
+
+        print("A chamada deve ser finalizada aqui!")
 
