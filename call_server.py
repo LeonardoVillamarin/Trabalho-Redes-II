@@ -24,7 +24,6 @@ class CallServer:
         output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2,
                                       frames_per_buffer=buffer)
         while True:
-            print("Iniciando o listen")
             msg, client = self.udp.recvfrom(buffer)
             print(client, str(msg))
             print("Vou testar com " + str(msg))
@@ -40,7 +39,8 @@ class CallServer:
             elif "encerrar_ligacao" in str(msg):
                 self.in_call = False
                 print("Encerra ligação")
-            else:
+
+            if self.in_call:
                 print("Recebendo audio!")
                 output_stream.write(msg)
 
@@ -70,7 +70,11 @@ class CallServer:
                 udp.sendto(data, dest)
 
             print("A chamada deve ser finalizada aqui!")
+            udp.sendto("encerra_ligacao", dest)
 
         except Exception as e:
             print(str(e))
 
+    def end_call(self, call_window):
+        call_window.destroy()
+        self.in_call = False

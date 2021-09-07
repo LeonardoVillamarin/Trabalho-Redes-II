@@ -72,6 +72,8 @@ class CallManager:
             print(str(e))
 
     def end_call(self):
+        self.call_window_obj.destroy()
+        self.ring_sound_obj.stop_all_sounds()
         self.in_call = False
 
 # TODO: Alguém precisa fechar esse tanto de thread aberta. Está gerendo travaentos ao encerrar o app.

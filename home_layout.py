@@ -6,6 +6,7 @@ import call_manager
 import call_server
 import client as client
 import sounds
+from cronometer import Cronometer
 
 
 def event_callback(e):
@@ -112,25 +113,49 @@ def set_logcat():
     lb_logcat.place(x=40, y=600)
 
 
-def init_call():
+def init_call(incomming_call=False, origin="", username=""):
     global call_window
     call_window = Toplevel()
     call_window.geometry("300x300")
     call_window.configure(background='#EFEFEF')
     call_window.title("Realizando chamada")
-    Label(call_window, text="Ligando para", background='#EFEFEF', fg='black', font=("Arial", 18)).pack(
+    Label(call_window, text="Em ligação com", background='#EFEFEF', fg='black', font=("Arial", 18)).pack(
         side="top")
-    Label(call_window, text=last_users['clients'][lb_users.curselection()[0]]['user'], background='#EFEFEF', fg='black',
-          font=("Arial", 26, "bold")).pack()
 
-    sound_obj.play_ring_call_sound()
-    #Todo: Se já existir call_manager, não é preciso criar um novo
-    call_manager_obj = call_manager.CallManager(current_user, last_users['clients'][lb_users.curselection()[0]],
-                                                call_window, sound_obj)
+    if incomming_call:  # Chamada recebida
+        Label(call_window, text=username, background='#EFEFEF',
+              fg='black',
+              font=("Arial", 26, "bold")).pack()
 
-    photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
-    Button(call_window, text='Click Me !', image=photo_reject,
-           command=call_manager_obj.end_call).pack()
+        lbl = Label(call_window, text="00:00:00", background='#EFEFEF', fg='black',
+                    font=("Arial", 18))
+        lbl.pack()
+        cronometer = Cronometer(lbl)
+        cronometer.start_counter()
+
+        photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
+        Button(call_window, text='Click Me !', image=photo_reject,
+               command=lambda: call_server_obj.end_call(call_window)).pack()
+
+    else:  # Usuário atual está fazendo a chamada
+        Label(call_window, text=last_users['clients'][lb_users.curselection()[0]]['user'], background='#EFEFEF',
+              fg='black',
+              font=("Arial", 26, "bold")).pack()
+
+        lbl = Label(call_window, text="00:00:00", background='#EFEFEF', fg='black',
+                    font=("Arial", 18))
+        lbl.pack()
+        cronometer = Cronometer(lbl)
+        cronometer.start_counter()
+
+        sound_obj.play_ring_call_sound()
+        # Todo: Se já existir call_manager, não é preciso criar um novo
+        call_manager_obj = call_manager.CallManager(current_user, last_users['clients'][lb_users.curselection()[0]],
+                                                    call_window, sound_obj)
+
+        photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
+        Button(call_window, text='Click Me !', image=photo_reject,
+               command=call_manager_obj.end_call).pack()
     call_window.mainloop()
 
 
@@ -147,22 +172,29 @@ def receive_call_popup(event):
     call_window.geometry("300x180")
     call_window.configure(background='#EFEFEF')
     call_window.title("Recebendo chamada")
-    Label(call_window, text="Recebendo chamada de", background='#EFEFEF', fg='black', font=("Arial", 18)).pack(side="top")
-    Label(call_window, text=call_server_obj.current_client["username"], background='#EFEFEF', fg='black', font=("Arial", 26, "bold")).pack()
+    Label(call_window, text="Recebendo chamada de", background='#EFEFEF', fg='black', font=("Arial", 18)).pack(
+        side="top")
+    Label(call_window, text=call_server_obj.current_client["username"], background='#EFEFEF', fg='black',
+          font=("Arial", 26, "bold")).pack()
 
     photo_accept = PhotoImage(master=call_window, file="assets/images/accept_call_btn.png")
-    Button(call_window, text='Click Me !', image=photo_accept, command=lambda: answer_call(call_server_obj, call_window, "aceito", origin)).place(x=90, y=100)
+    Button(call_window, text='accept', image=photo_accept,
+           command=lambda: answer_call(call_server_obj, call_window, "aceito", origin,
+                                       call_server_obj.current_client["username"])).place(x=90, y=100)
 
     photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
-    Button(call_window, text='Click Me !', image=photo_reject, command=lambda: answer_call(call_server_obj, call_window, "rejeitado", origin)).place(x=150, y=100)
-    # sounds.play_incoming_call_sound()
+    Button(call_window, text='reject', image=photo_reject,
+           command=lambda: answer_call(call_server_obj, call_window, "rejeitado", origin,
+                                       call_server_obj.current_client["username"])).place(x=150, y=100)
     call_window.mainloop()
 
 
-def answer_call(call_server_obj, popup, answer, origin):
+def answer_call(call_server_obj, popup, answer, origin, username):
     sound_obj.stop_all_sounds()
     popup.destroy()
     call_server_obj.answer_invitation(answer, origin)
+    if 'aceito' in answer:
+        init_call(True, origin, username)
 
 
 def set_home(current_ip, username=""):
@@ -181,8 +213,8 @@ def set_home(current_ip, username=""):
     window.title("Calls UFF")
 
     Label(window, text="Olá, " + username.split(" ")[0].strip() + '.', background='#EFEFEF', fg='black',
-                 font=("Arial", 24, "bold")).place(x=40, y=40)
-    Label(window, text="Com quem vamos falar hoje?", background='#EFEFEF', fg='black', font=("Arial", 20))\
+          font=("Arial", 24, "bold")).place(x=40, y=40)
+    Label(window, text="Com quem vamos falar hoje?", background='#EFEFEF', fg='black', font=("Arial", 20)) \
         .place(x=40, y=70)
 
     Label(window, text="Nome do usuário: ", background='#EFEFEF', fg='black', font=("Arial", 16)).place(x=40, y=115)
