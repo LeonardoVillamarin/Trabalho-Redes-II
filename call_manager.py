@@ -6,7 +6,7 @@ import pyaudio
 def start_call(origin, dest_server):
     print(" Destino: " + str(dest_server))
     HOST = dest_server['ip']
-    PORT = 6002
+    PORT = 6003
     udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     dest = (HOST, PORT)
     thread = threading.Thread(target=listen, args=(udp,))

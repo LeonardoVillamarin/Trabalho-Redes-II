@@ -48,7 +48,7 @@ def conn(username, server_ip):
 
     HOST = server_ip
     print(HOST)
-    PORT = 5002
+    PORT = 5003
 
     dest = (HOST, PORT)
     tcp.connect(dest)

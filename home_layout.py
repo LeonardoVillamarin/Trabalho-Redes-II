@@ -122,7 +122,7 @@ def init_call():
     call_window.mainloop()
 
 
-def receive_call_popup(call_server_obj):
+def receive_call_popup():
     print("Recebendo chamada deste cliente: " + str(call_server_obj.current_client))
 
     if call_server_obj.current_client == {}:
@@ -198,8 +198,8 @@ def set_home(current_ip, username=""):
 
     set_logcat()
     search_user()
-    #Todo: Abrir obj aqui
+    global call_server_obj
     call_server_obj = call_server.CallServer(current_ip)
     client.start_listener(call_server_obj, event_callback, window)
-    window.bind("<<newCall>>", lambda: receive_call_popup(call_server_obj))
+    window.bind("<<newCall>>", receive_call_popup)
     window.mainloop()
