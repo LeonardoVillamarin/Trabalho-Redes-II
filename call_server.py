@@ -10,7 +10,7 @@ class CallServer:
     def __init__(self, current_ip):
         self.current_client = {}
         HOST = current_ip
-        PORT = 6001
+        PORT = 6002
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         orig = (HOST, PORT)
         self.udp.bind(orig)
@@ -29,7 +29,7 @@ class CallServer:
             print(client, str(msg))
             print("Vou testar com " + str(msg))
             if "convite" in str(msg):
-                self.current_client = client
+                self.current_client = {"username": msg.split("/")[1], "ip": client[0], "port": client[1]}
                 time.sleep(2)
                 print("Gerando event")
                 window.event_generate("<<newCall>>")

@@ -201,5 +201,5 @@ def set_home(current_ip, username=""):
     #Todo: Abrir obj aqui
     call_server_obj = call_server.CallServer(current_ip)
     client.start_listener(call_server_obj, event_callback, window)
-    # window.bind("<<newCall>>", receive_call_popup(call_server_obj))
+    window.bind("<<newCall>>", lambda: receive_call_popup(call_server_obj))
     window.mainloop()
