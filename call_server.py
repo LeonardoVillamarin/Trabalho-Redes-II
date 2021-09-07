@@ -33,19 +33,19 @@ class CallServer:
                 time.sleep(2)
                 print("Gerando event")
                 window.event_generate("<<newCall>>")
+                print("depois do event")
             elif "encerrar_ligacao" in str(msg):
                 # TODO: Para de enviar o audio. A conexão não deve ser encerrada aqui
-                self.udp.close()
+                print("Encerra ligação")
+                #self.udp.close()
             else:
                 print("Recebendo audio!")
-                # Se não é nenhuma das opações acima, então é audio que tá chegando. Preciso reproduzir.
-
                 output_stream.write(msg)
 
     def answer_invitation(self, answer, dest):
         try:
             print("Resposta: " + answer)
-            self.udp.sendto(answer.encode(), tuple(dest))
+            self.udp.sendto(answer.encode(), tuple([dest["ip"], dest["port"]]))
         except Exception as e:
             print("Deu erro:" + str(e))
 
