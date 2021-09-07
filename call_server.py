@@ -27,7 +27,7 @@ class CallServer:
             if "convite" in msg.decode():
                 self.current_client = client
                 time.sleep(2)
-                window.event_generate("<<newCall>>", when="tail")
+                window.event_generate("<<newCall>>")
             elif "encerrar_ligacao" in msg.decode():
                 # TODO: Para de enviar o audio. A conexão não deve ser encerrada aqui
                 self.udp.close()
