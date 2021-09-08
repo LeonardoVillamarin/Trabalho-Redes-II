@@ -17,10 +17,11 @@ def listen_server(callback):
         print("Conexão finalizada")
 
 
-def start_listener(call_server_obj, callback, window):
+def start_listener(call_server_obj, callback, window, state_manager):
     """
     Inicia thread com método responsável pela escuta das respostas do servidor. É feita em uma thread separada para não
     bloquear o fluxo de execução principal da aplicação
+    :param state_manager: Gerenciador de estados de chamadas
     :param call_server_obj: Objeto do servidor de ligação
     :param window: GUI tkinter
     :param callback: Função passada como parâmetro pela view para exibir retornos do servidor.

@@ -2,17 +2,18 @@ import time
 import pyaudio
 import socket
 import threading
+from state_manager import CallState
 
 
 class CallServer:
     """
     Servidor de ligação. Responsável por receber e tratar dados e chamadas.
     """
-    def __init__(self, current_ip, sound_obj):
+    def __init__(self, current_ip, sound_obj, state_manager):
         self.current_client = {}
-        self.in_call = False
         self.sound_obj = sound_obj
         self.call_window = None
+        self.state_manager = state_manager
         HOST = current_ip
         PORT = 6004
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -45,10 +46,10 @@ class CallServer:
                 thread.start()
                 print("depois do event")
             elif "encerrar_ligacao" in str(msg):
-                self.in_call = False
+                self.state_manager.set_current_state(CallState.IDLE)
                 print("Encerra ligação")
 
-            if self.in_call:
+            if self.state_manager == CallState.IN_CALL:
                 print("Recebendo audio!")
                 output_stream.write(msg)
 
@@ -63,7 +64,7 @@ class CallServer:
             self.udp.sendto(answer.encode(), tuple([dest["ip"], dest["port"]]))
 
             if 'aceito' in answer:
-                self.in_call = True
+                self.state_manager.set_current_state(CallState.IN_CALL)
                 thread = threading.Thread(target=self.send_audio, args=(self.udp, tuple([dest["ip"], dest["port"]]),))
                 thread.start()
 
@@ -82,7 +83,7 @@ class CallServer:
 
             input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=1,
                                          frames_per_buffer=buffer)
-            while self.in_call:
+            while self.state_manager == CallState.IN_CALL:
                 print("Enviando audio!")
                 data = input_stream.read(buffer, exception_on_overflow = False)
                 udp.sendto(data, dest)
@@ -102,7 +103,7 @@ class CallServer:
         :param call_window: Popup de chamada atual
         """
         call_window.destroy()
-        self.in_call = False
+        self.state_manager.set_current_state(CallState.IDLE)
 
     def set_call_window(self, call_window):
         """

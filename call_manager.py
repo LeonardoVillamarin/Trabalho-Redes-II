@@ -1,6 +1,7 @@
 import socket
 import threading
 import pyaudio
+from state_manager import CallState
 
 
 class CallManager:
@@ -8,14 +9,14 @@ class CallManager:
     CallManager é responsável por gerenciar todas as chamadas realizadas pelo cliente atual.
     """
 
-    def __init__(self, origin, dest_server, call_window, ring_sound):
+    def __init__(self, origin, dest_server, call_window, ring_sound, state_manager):
         print(" Destino: " + str(dest_server))
         HOST = dest_server['ip']
         PORT = 6004
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.in_call = False
         self.ring_sound_obj = ring_sound
         self.call_window_obj = call_window
+        self.state_manager = state_manager
         dest = (HOST, PORT)
         thread = threading.Thread(target=self.listen, args=(self.udp,))
         thread.start()
@@ -46,7 +47,7 @@ class CallManager:
                 print("Recebi essa mensagem: " + str(msg) + " Veio desse endereço: " + str(addrress))
                 if "aceito" in str(msg):
                     print("Iniciando chamada")
-                    self.in_call = True
+                    self.state_manager.set_current_state(CallState.IN_CALL)
                     self.ring_sound_obj.stop_all_sounds()
                     thread = threading.Thread(target=self.send_audio, args=(addrress,))
                     thread.start()
@@ -57,9 +58,9 @@ class CallManager:
 
                 elif "encerrar_ligacao" in str(msg):
                     self.call_window_obj.destroy()
-                    self.in_call = False
+                    self.state_manager.set_current_state(CallState.IDLE)
 
-                if self.in_call:
+                if self.state_manager == CallState.IN_CALL:
                     output_stream.write(msg)
 
             except Exception as e:
@@ -77,7 +78,7 @@ class CallManager:
             input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=1,
                                          frames_per_buffer=buffer)
 
-            while self.in_call:
+            while self.state_manager == CallState.IN_CALL:
                 print("Enviando audio!")
                 data = input_stream.read(buffer, exception_on_overflow=False)
                 self.udp.sendto(data, dest)
@@ -95,6 +96,6 @@ class CallManager:
         """
         self.call_window_obj.destroy()
         self.ring_sound_obj.stop_all_sounds()
-        self.in_call = False
+        self.state_manager.set_current_state(CallState.IDLE)
 
 # TODO: Alguém precisa fechar esse tanto de thread aberta. Está gerendo travaentos ao encerrar o app.

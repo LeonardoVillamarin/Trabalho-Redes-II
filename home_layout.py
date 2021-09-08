@@ -7,6 +7,7 @@ import call_server
 import client as client
 import sounds
 from cronometer import Cronometer
+from state_manager import StateManager
 
 
 def event_callback(e):
@@ -157,7 +158,7 @@ def init_call(incomming_call=False, origin="", username=""):
         sound_obj.play_ring_call_sound()
         # Todo: Se já existir call_manager, não é preciso criar um novo
         call_manager_obj = call_manager.CallManager(current_user, last_users['clients'][lb_users.curselection()[0]],
-                                                    call_window, sound_obj)
+                                                    call_window, sound_obj, state_manager)
 
         photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
         Button(call_window, text='Click Me !', image=photo_reject,
@@ -263,7 +264,10 @@ def set_home(current_ip, username=""):
     global call_server_obj
     global sound_obj
     sound_obj = sounds.Sound()
-    call_server_obj = call_server.CallServer(current_ip, sound_obj)
-    client.start_listener(call_server_obj, event_callback, window)
+    global state_manager
+    state_manager = StateManager()
+    call_server_obj = call_server.CallServer(current_ip, sound_obj, state_manager)
+    client.start_listener(call_server_obj, event_callback, window, state_manager)
+
     window.bind("<<newCall>>", receive_call_popup)
     window.mainloop()
