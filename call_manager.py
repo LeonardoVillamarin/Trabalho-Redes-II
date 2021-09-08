@@ -60,7 +60,7 @@ class CallManager:
                     self.call_window_obj.destroy()
                     self.state_manager.set_current_state(CallState.IDLE)
 
-                if self.state_manager == CallState.IN_CALL:
+                if self.state_manager.call_state == CallState.IN_CALL:
                     output_stream.write(msg)
 
             except Exception as e:
@@ -78,7 +78,7 @@ class CallManager:
             input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=1,
                                          frames_per_buffer=buffer)
 
-            while self.state_manager == CallState.IN_CALL:
+            while self.state_manager.call_state == CallState.IN_CALL:
                 print("Enviando audio!")
                 data = input_stream.read(buffer, exception_on_overflow=False)
                 self.udp.sendto(data, dest)
