@@ -27,4 +27,4 @@ https://docs.google.com/document/d/1s9ljtQjPkCMmaLctuc8opJll51Q_rt0FEvDjdfIehDM/
 
 ### A documentação completa da parte 2 está disponível em:
 
-https://docs.google.com/document/d/16Y_ddKTC8OxsUBMlch-DIuklh8dxYCa0LMcYr7MVYB0/edit
+https://docs.google.com/document/d/16Y_ddKTC8OxsUBMlch-DIuklh8dxYCa0LMcYr7MVYB0/edit?usp=sharing
