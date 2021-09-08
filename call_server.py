@@ -37,14 +37,17 @@ class CallServer:
             print(client, str(msg))
             print("Vou testar com " + str(msg))
             if "convite" in str(msg):
-                self.current_client = {"username": msg.decode().split("/")[1], "ip": str(client[0]),
-                                       "port": int(client[1])}
-                time.sleep(2)
-                print("Gerando event")
-                self.sound_obj.play_incoming_call_sound()
-                thread = threading.Thread(target=window.event_generate, args=("<<newCall>>",))
-                thread.start()
-                print("depois do event")
+                if self.state_manager.call_state == CallState.IN_CALL:
+                    self.udp.sendto("rejeitado".encode(), client)
+                else:
+                    self.current_client = {"username": msg.decode().split("/")[1], "ip": str(client[0]),
+                                           "port": int(client[1])}
+                    time.sleep(2)
+                    print("Gerando event")
+                    self.sound_obj.play_incoming_call_sound()
+                    thread = threading.Thread(target=window.event_generate, args=("<<newCall>>",))
+                    thread.start()
+                    print("depois do event")
             elif "encerrar_ligacao" in str(msg):
                 self.state_manager.set_current_state(CallState.IDLE)
                 print("Encerra ligação")
