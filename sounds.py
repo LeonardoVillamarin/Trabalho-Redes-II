@@ -5,6 +5,11 @@ import threading
 
 class Sound:
 
+    """
+    Classe que gerencia os sons do app.
+    Som de chamada recebida, discagem e etc.
+    """
+
     def __init__(self):
         self.need_play = False
 

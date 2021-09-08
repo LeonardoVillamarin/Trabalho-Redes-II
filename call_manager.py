@@ -4,6 +4,9 @@ import pyaudio
 
 
 class CallManager:
+    """
+    CallManager é responsável por gerenciar todas as chamadas realizadas pelo cliente atual.
+    """
 
     def __init__(self, origin, dest_server, call_window, ring_sound):
         print(" Destino: " + str(dest_server))
@@ -19,13 +22,23 @@ class CallManager:
         self.send_message(("convite/" + origin), dest)
 
     def send_message(self, msg, dest):
+        """
+        Envia uma mensagem udp
+        :param msg: Payload da mensagem
+        :param dest: Endereço de envio da mensagem
+        """
         print("Enviando mensagem: " + msg)
         self.udp.sendto(msg.encode(), dest)
 
     def listen(self, udp):
+        """
+        Recebe dados do outro usuário. Isto é, quem responde a chamada.
+        :param udp: Objeto da conexão atual.
+        """
+
         py_audio = pyaudio.PyAudio()
         buffer = 4096
-        output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=2,
+        output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=1,
                                       frames_per_buffer=buffer)
         while True:
             try:
@@ -42,7 +55,7 @@ class CallManager:
                     self.ring_sound_obj.stop_all_sounds()
                     self.call_window_obj.destroy()
 
-                elif "encerra_ligacao" in str(msg):
+                elif "encerrar_ligacao" in str(msg):
                     self.call_window_obj.destroy()
                     self.in_call = False
 
@@ -53,11 +66,15 @@ class CallManager:
                 print("Error: " + str(e))
 
     def send_audio(self, dest):
+        """
+        Envia audio para o outro usuário
+        :param dest: Destino do outro usuário
+        """
         try:
             py_audio = pyaudio.PyAudio()
             buffer = 1024
 
-            input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=2,
+            input_stream = py_audio.open(format=pyaudio.paInt16, input=True, rate=44100, channels=1,
                                          frames_per_buffer=buffer)
 
             while self.in_call:
@@ -73,6 +90,9 @@ class CallManager:
             print(str(e))
 
     def end_call(self):
+        """
+        Finaliza chamada atual
+        """
         self.call_window_obj.destroy()
         self.ring_sound_obj.stop_all_sounds()
         self.in_call = False

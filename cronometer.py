@@ -1,4 +1,7 @@
 class Cronometer:
+    """
+    Classe que gerência o cronômetro durante uma chamada.
+    """
     def __init__(self, label):
         self.current_time = 0
         self.is_counting = False

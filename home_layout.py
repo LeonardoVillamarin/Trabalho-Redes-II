@@ -114,6 +114,12 @@ def set_logcat():
 
 
 def init_call(incomming_call=False, origin="", username=""):
+    """
+        Popup de chamada para o usuário atual.
+    :param incomming_call: Boolean que representa se a chamada foi recebida ou realizada pelo cliente atual.
+    :param origin: Origem da chamada
+    :param username: Usuário que fez a chamada
+    """
     global call_window
     call_window = Toplevel()
     call_window.geometry("300x200")
@@ -132,7 +138,7 @@ def init_call(incomming_call=False, origin="", username=""):
         lbl.pack()
         cronometer = Cronometer(lbl)
         cronometer.start_counter()
-
+        call_server_obj.set_call_window(call_window)
         photo_reject = PhotoImage(master=call_window, file="assets/images/reject_call_btn.png")
         Button(call_window, text='Click Me !', image=photo_reject,
                command=lambda: call_server_obj.end_call(call_window)).pack()
@@ -160,6 +166,10 @@ def init_call(incomming_call=False, origin="", username=""):
 
 
 def receive_call_popup(event):
+    """
+    popup exibida ao receber uma chamada
+    :param event: Event necessário para usar o tkinter
+    """
     print("Recebendo chamada deste cliente: " + str(call_server_obj.current_client))
 
     if call_server_obj.current_client == {}:
@@ -190,13 +200,21 @@ def receive_call_popup(event):
 
 
 def answer_call(call_server_obj, popup, answer, origin, username):
+    """
+        Envia ao call_server a resposta da ligação
+    :param call_server_obj: obj do servidor de ligação
+    :param popup: popup de chamada corrente
+    :param answer: Resposta fornecida pelo usuário
+    :param origin: Origem da chamada
+    :param username: Usuário que solicitou a chamada
+    """
     sound_obj.stop_all_sounds()
     popup.destroy()
     call_server_obj.answer_invitation(answer, origin)
     if 'aceito' in answer:
         init_call(True, origin, username)
 
-
+    # TODO: Adicionar oa Logcat
 def set_home(current_ip, username=""):
     """
     Entry Point da home.
