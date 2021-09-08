@@ -66,6 +66,7 @@ class CallManager:
                 self.udp.sendto(data, dest)
 
             print("Hora de finalizar a chamada!")
+            self.udp.sendto("encerra_ligacao".encode(), dest)
             self.call_window_obj.destroy()
 
         except Exception as e:

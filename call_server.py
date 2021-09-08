@@ -70,7 +70,7 @@ class CallServer:
                 udp.sendto(data, dest)
 
             print("A chamada deve ser finalizada aqui!")
-            udp.sendto("encerra_ligacao", dest)
+            udp.sendto("encerra_ligacao".encode(), dest)
 
         except Exception as e:
             print(str(e))
