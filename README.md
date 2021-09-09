@@ -12,7 +12,7 @@ Alunos: João Victor Simonassi e Leonardo Villamarin.
 
 2 - Para iniciar o servidor, execute:
 
-	python3 server.py
+	python3 register_server.py
 
 3 - Para iniciar o cliente, execute:
 
