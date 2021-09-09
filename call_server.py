@@ -9,13 +9,14 @@ class CallServer:
     """
     Servidor de ligação. Responsável por receber e tratar dados e chamadas.
     """
-    def __init__(self, current_ip, sound_obj, state_manager):
+    def __init__(self, current_ip, sound_obj, state_manager, callback):
         self.current_client = {}
         self.sound_obj = sound_obj
         self.call_window = None
         self.state_manager = state_manager
+        self.callback = callback
         HOST = current_ip
-        PORT = 6004
+        PORT = 6005
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         orig = (HOST, PORT)
         self.udp.bind(orig)
@@ -27,7 +28,7 @@ class CallServer:
         :param window: Tela principal da aplicação
         """
         print("Iniciando servidor")
-
+        self.callback('{"info": "Iniciando servidor de ligação"}')
         py_audio = pyaudio.PyAudio()
         buffer = 4096
         output_stream = py_audio.open(format=pyaudio.paInt16, output=True, rate=44100, channels=1,
@@ -38,7 +39,8 @@ class CallServer:
             print("Vou testar com " + str(msg))
             if "convite" in str(msg):
                 if self.state_manager.call_state == CallState.IN_CALL:
-                    self.udp.sendto("rejeitado".encode(), client)
+                    self.callback('{"convite": "' + str(msg) + '"}')
+                    self.udp.sendto("rejeitado - Usuário ocupado".encode(), client)
                 else:
                     self.current_client = {"username": msg.decode().split("/")[1], "ip": str(client[0]),
                                            "port": int(client[1])}
@@ -49,6 +51,7 @@ class CallServer:
                     thread.start()
                     print("depois do event")
             elif "encerrar_ligacao" in str(msg):
+                self.callback('{"encerrar_ligacao": "' + str(msg) + '"}')
                 self.state_manager.set_current_state(CallState.IDLE)
                 print("Encerra ligação")
 
@@ -64,6 +67,7 @@ class CallServer:
         """
         try:
             print("Resposta: " + answer)
+            self.callback('{"resposta": "' + str(answer) + '"}')
             self.udp.sendto(answer.encode(), tuple([dest["ip"], dest["port"]]))
 
             if 'aceito' in answer:

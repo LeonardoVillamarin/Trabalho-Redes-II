@@ -9,7 +9,7 @@ class CallManager:
     CallManager é responsável por gerenciar todas as chamadas realizadas pelo cliente atual.
     """
 
-    def __init__(self, origin, dest_server, call_window, ring_sound, state_manager):
+    def __init__(self, origin, dest_server, call_window, ring_sound, state_manager, callback):
         print(" Destino: " + str(dest_server))
         HOST = dest_server['ip']
         PORT = 6004
@@ -17,6 +17,7 @@ class CallManager:
         self.ring_sound_obj = ring_sound
         self.call_window_obj = call_window
         self.state_manager = state_manager
+        self.callback = callback
         dest = (HOST, PORT)
         thread = threading.Thread(target=self.listen, args=(self.udp,))
         thread.start()
@@ -47,16 +48,19 @@ class CallManager:
                 print("Recebi essa mensagem: " + str(msg) + " Veio desse endereço: " + str(addrress))
                 if "aceito" in str(msg):
                     print("Iniciando chamada")
+                    self.callback('{"convite": "' + str(msg) + '"}')
                     self.state_manager.set_current_state(CallState.IN_CALL)
                     self.ring_sound_obj.stop_all_sounds()
                     thread = threading.Thread(target=self.send_audio, args=(addrress,))
                     thread.start()
 
                 if "rejeitado" in str(msg):
+                    self.callback('{"rejeitado": "' + str(msg) + '"}')
                     self.ring_sound_obj.stop_all_sounds()
                     self.call_window_obj.destroy()
 
                 elif "encerrar_ligacao" in str(msg):
+                    self.callback('{"encerra_ligacao": "' + str(msg) + '"}')
                     self.call_window_obj.destroy()
                     self.state_manager.set_current_state(CallState.IDLE)
 
