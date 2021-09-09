@@ -8,6 +8,7 @@ import client as client
 import sounds
 from cronometer import Cronometer
 from state_manager import StateManager
+import os
 
 
 def event_callback(e):
@@ -49,7 +50,7 @@ def close_conn():
     Solicita fechamento de conexão.
     """
     client.close_conn()
-    exit(0)
+    os._exit(0)
 
 
 def immediately(e):
